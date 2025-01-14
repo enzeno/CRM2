@@ -1,0 +1,56 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="using:CRM2.Desktop.ViewModels"
+        mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="800"
+        x:Class="CRM2.Desktop.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Title="CRM2 System"
+        TransparencyLevelHint="AcrylicBlur"
+        Background="Transparent"
+        ExtendClientAreaToDecorationsHint="True">
+
+    <Panel>
+        <ExperimentalAcrylicBorder IsHitTestVisible="False">
+            <ExperimentalAcrylicBorder.Material>
+                <ExperimentalAcrylicMaterial
+                    BackgroundSource="Digger"
+                    TintColor="Black"
+                    TintOpacity="1"
+                    MaterialOpacity="0.65" />
+            </ExperimentalAcrylicBorder.Material>
+        </ExperimentalAcrylicBorder>
+
+        <DockPanel Margin="40,0,0,0">
+            <!-- Left Navigation Panel -->
+            <StackPanel DockPanel.Dock="Left" Width="200" Margin="0,40,0,0" Spacing="10">
+                <TextBlock Text="CRM2 System" FontSize="24" FontWeight="Bold" Margin="0,0,0,20"/>
+                
+                <!-- Navigation Buttons -->
+                <Button Content="Contacts" 
+                        Command="{Binding NavigateToContactsCommand}"
+                        HorizontalAlignment="Stretch"
+                        Height="40"
+                        Margin="0,5"/>
+                
+                <Button Content="Invoices" 
+                        Command="{Binding NavigateToInvoicesCommand}"
+                        HorizontalAlignment="Stretch"
+                        Height="40"
+                        Margin="0,5"/>
+                
+                <Button Content="Reports" 
+                        Command="{Binding NavigateToReportsCommand}"
+                        HorizontalAlignment="Stretch"
+                        Height="40"
+                        Margin="0,5"/>
+            </StackPanel>
+
+            <!-- Main Content Area -->
+            <Panel DockPanel.Dock="Right" Margin="20,40,20,20">
+                <ContentControl Content="{Binding CurrentView}" />
+            </Panel>
+        </DockPanel>
+    </Panel>
+</Window>

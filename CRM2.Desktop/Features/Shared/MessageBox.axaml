@@ -1,0 +1,22 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:shared="using:CRM2.Desktop.Features.Shared"
+        mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="200"
+        x:Class="CRM2.Desktop.Features.Shared.MessageBox"
+        x:DataType="shared:MessageBox"
+        Title="{Binding DialogTitle}"
+        Width="400" Height="200"
+        WindowStartupLocation="CenterOwner"
+        CanResize="False">
+
+    <DockPanel Margin="20">
+        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+            <Button Content="OK" Click="OkButton_Click" IsDefault="True"/>
+            <Button Content="Cancel" Click="CancelButton_Click" IsCancel="True" IsVisible="{Binding ShowCancel}"/>
+        </StackPanel>
+        
+        <TextBlock Text="{Binding Message}" TextWrapping="Wrap" VerticalAlignment="Center"/>
+    </DockPanel>
+</Window> 

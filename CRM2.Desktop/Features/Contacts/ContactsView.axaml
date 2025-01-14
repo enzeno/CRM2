@@ -1,0 +1,54 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:CRM2.Desktop.Features.Contacts"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="CRM2.Desktop.Features.Contacts.ContactsView"
+             x:DataType="vm:ContactsViewModel">
+    <DockPanel>
+        <StackPanel DockPanel.Dock="Top" Margin="10">
+            <TextBlock Text="{Binding StatusMessage}" 
+                       Foreground="{Binding StatusMessage, Converter={x:Static vm:StatusToColorConverter.Instance}}"
+                       IsVisible="{Binding StatusMessage, Converter={x:Static vm:StringNotEmptyConverter.Instance}}"/>
+            <TextBox Text="{Binding SearchText}" Watermark="Search contacts..." Margin="0,10,0,10"/>
+            <Button Content="Add Contact" Command="{Binding AddContactCommand}" HorizontalAlignment="Right"/>
+        </StackPanel>
+
+        <DataGrid ItemsSource="{Binding Contacts}"
+                  SelectedItem="{Binding SelectedContact}"
+                  IsReadOnly="True"
+                  GridLinesVisibility="All"
+                  BorderThickness="1"
+                  BorderBrush="Gray"
+                  Margin="10">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="ID" Binding="{Binding ContactId}"/>
+                <DataGridTextColumn Header="Type" Binding="{Binding ContactType}"/>
+                <DataGridTextColumn Header="Organization" Binding="{Binding OrganizationName}"/>
+                <DataGridTextColumn Header="Address" Binding="{Binding AddressLine1}"/>
+                <DataGridTextColumn Header="City" Binding="{Binding City}"/>
+                <DataGridTextColumn Header="Country" Binding="{Binding Country}"/>
+                <DataGridTextColumn Header="Email" Binding="{Binding Email}"/>
+                <DataGridTextColumn Header="Phone" Binding="{Binding PhoneNumber}"/>
+                <DataGridTextColumn Header="Tax ID" Binding="{Binding TaxId}"/>
+                <DataGridTextColumn Header="Tax Rate" Binding="{Binding TaxRate, StringFormat={}{0:P2}}"/>
+                
+                <DataGridTemplateColumn Header="Actions" Width="100">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal" Spacing="5">
+                                <Button Content="Edit"
+                                        Command="{Binding $parent[DataGrid].((vm:ContactsViewModel)DataContext).EditContactCommand}"
+                                        CommandParameter="{Binding}"/>
+                                <Button Content="Delete"
+                                        Command="{Binding $parent[DataGrid].((vm:ContactsViewModel)DataContext).DeleteContactCommand}"
+                                        CommandParameter="{Binding}"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+    </DockPanel>
+</UserControl> 

@@ -1,0 +1,65 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="using:CRM2.Desktop.Features.Contacts"
+        mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="800"
+        x:Class="CRM2.Desktop.Features.Contacts.ContactDialog"
+        x:DataType="vm:ContactDialogViewModel"
+        Title="{Binding Title}"
+        Width="600" Height="800"
+        Name="ContactDialogWindow">
+    
+    <ScrollViewer>
+        <StackPanel Margin="20">
+            <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto" Margin="0,0,0,20">
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="Contact ID:" VerticalAlignment="Center" Margin="0,0,10,10"/>
+                <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding ContactId}" Watermark="Enter unique contact ID" Margin="0,0,0,10"/>
+
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="Contact Type:" VerticalAlignment="Center" Margin="0,0,10,10"/>
+                <ComboBox Grid.Row="1" Grid.Column="1" SelectedItem="{Binding ContactType}" ItemsSource="{Binding ContactTypes}" HorizontalAlignment="Stretch" Margin="0,0,0,10"/>
+
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="Organization:" VerticalAlignment="Center" Margin="0,0,10,10"/>
+                <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding OrganizationName}" Watermark="Organization Name" Margin="0,0,0,10"/>
+
+                <TextBlock Grid.Row="3" Grid.Column="0" Text="Address Line 1:" VerticalAlignment="Center" Margin="0,0,10,10"/>
+                <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding AddressLine1}" Watermark="Street address, P.O. box" Margin="0,0,0,10"/>
+
+                <TextBlock Grid.Row="4" Grid.Column="0" Text="Address Line 2:" VerticalAlignment="Center" Margin="0,0,10,10"/>
+                <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding AddressLine2}" Watermark="Apartment, suite, unit, building, floor" Margin="0,0,0,10"/>
+
+                <TextBlock Grid.Row="5" Grid.Column="0" Text="Address Line 3:" VerticalAlignment="Center" Margin="0,0,10,10"/>
+                <TextBox Grid.Row="5" Grid.Column="1" Text="{Binding AddressLine3}" Watermark="Additional address information" Margin="0,0,0,10"/>
+
+                <TextBlock Grid.Row="6" Grid.Column="0" Text="Postal Code:" VerticalAlignment="Center" Margin="0,0,10,10"/>
+                <TextBox Grid.Row="6" Grid.Column="1" Text="{Binding PostalCode}" Watermark="ZIP or postal code" Margin="0,0,0,10"/>
+
+                <TextBlock Grid.Row="7" Grid.Column="0" Text="City:" VerticalAlignment="Center" Margin="0,0,10,10"/>
+                <TextBox Grid.Row="7" Grid.Column="1" Text="{Binding City}" Watermark="City" Margin="0,0,0,10"/>
+
+                <TextBlock Grid.Row="8" Grid.Column="0" Text="Country:" VerticalAlignment="Center" Margin="0,0,10,10"/>
+                <TextBox Grid.Row="8" Grid.Column="1" Text="{Binding Country}" Watermark="Country" Margin="0,0,0,10"/>
+
+                <TextBlock Grid.Row="9" Grid.Column="0" Text="Email:" VerticalAlignment="Center" Margin="0,0,10,10"/>
+                <TextBox Grid.Row="9" Grid.Column="1" Text="{Binding Email}" Watermark="Email address" Margin="0,0,0,10"/>
+
+                <TextBlock Grid.Row="10" Grid.Column="0" Text="Phone:" VerticalAlignment="Center" Margin="0,0,10,10"/>
+                <TextBox Grid.Row="10" Grid.Column="1" Text="{Binding PhoneNumber}" Watermark="Phone number" Margin="0,0,0,10"/>
+
+                <TextBlock Grid.Row="11" Grid.Column="0" Text="Website:" VerticalAlignment="Center" Margin="0,0,10,10"/>
+                <TextBox Grid.Row="11" Grid.Column="1" Text="{Binding WebsiteUrl}" Watermark="Website URL" Margin="0,0,0,10"/>
+
+                <TextBlock Grid.Row="12" Grid.Column="0" Text="Tax ID:" VerticalAlignment="Center" Margin="0,0,10,10"/>
+                <TextBox Grid.Row="12" Grid.Column="1" Text="{Binding TaxId}" Watermark="Tax ID number" Margin="0,0,0,10"/>
+
+                <TextBlock Grid.Row="13" Grid.Column="0" Text="Tax Rate (%):" VerticalAlignment="Center" Margin="0,0,10,10"/>
+                <NumericUpDown Grid.Row="13" Grid.Column="1" Value="{Binding TaxRate}" Minimum="0" Maximum="100" Increment="0.1" FormatString="F2" Margin="0,0,0,10"/>
+            </Grid>
+            
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+                <Button Content="Save" Command="{Binding SaveCommand}" CommandParameter="{Binding #ContactDialogWindow}"/>
+                <Button Content="Cancel" Command="{Binding CancelCommand}" CommandParameter="{Binding #ContactDialogWindow}"/>
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</Window> 
