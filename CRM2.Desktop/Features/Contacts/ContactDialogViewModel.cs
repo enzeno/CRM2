@@ -1,27 +1,36 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using CRM2.Desktop.Features.Shared;
+using Avalonia.Controls;
 
 namespace CRM2.Desktop.Features.Contacts;
 
 public partial class ContactDialogViewModel : ObservableObject
 {
-    private readonly Window _owner;
-    private readonly ContactService _contactService;
+    private readonly IContactService _contactService;
+    private readonly Window _dialog;
     private readonly ContactDto? _existingContact;
+
+    public IReadOnlyList<string> ContactTypes { get; } = new List<string>
+    {
+        "CUSTOMER",
+        "SUPPLIER",
+        "BOTH"
+    };
 
     [ObservableProperty]
     private string _title;
 
     [ObservableProperty]
+    private string _statusMessage = string.Empty;
+
+    [ObservableProperty]
     private string _contactId = string.Empty;
 
     [ObservableProperty]
-    private string _contactType = "CUSTOMER";
+    private string _contactType = string.Empty;
 
     [ObservableProperty]
     private string _organizationName = string.Empty;
@@ -30,10 +39,10 @@ public partial class ContactDialogViewModel : ObservableObject
     private string _addressLine1 = string.Empty;
 
     [ObservableProperty]
-    private string _addressLine2 = string.Empty;
+    private string? _addressLine2;
 
     [ObservableProperty]
-    private string _addressLine3 = string.Empty;
+    private string? _addressLine3;
 
     [ObservableProperty]
     private string _postalCode = string.Empty;
@@ -51,84 +60,102 @@ public partial class ContactDialogViewModel : ObservableObject
     private string _phoneNumber = string.Empty;
 
     [ObservableProperty]
-    private string _websiteUrl = string.Empty;
+    private string? _websiteUrl;
 
     [ObservableProperty]
     private string _taxId = string.Empty;
 
     [ObservableProperty]
-    private decimal _taxRate = 0.0m;
+    private decimal _taxRate;
 
-    public List<string> ContactTypes { get; } = new() { "CUSTOMER", "SUPPLIER" };
-
-    public ContactDialogViewModel(Window owner, ContactService contactService, ContactDto? existingContact = null)
+    public ContactDialogViewModel(IContactService contactService, Window dialog, ContactDto? existingContact = null)
     {
-        _owner = owner;
         _contactService = contactService;
+        _dialog = dialog;
         _existingContact = existingContact;
-        _title = existingContact == null ? "Add Contact" : "Edit Contact";
+        _title = existingContact == null ? "Create New Contact" : "Edit Contact";
 
         if (existingContact != null)
         {
-            ContactId = existingContact.ContactId;
-            ContactType = existingContact.ContactType;
-            OrganizationName = existingContact.OrganizationName;
-            AddressLine1 = existingContact.AddressLine1;
-            AddressLine2 = existingContact.AddressLine2;
-            AddressLine3 = existingContact.AddressLine3;
-            PostalCode = existingContact.PostalCode;
-            City = existingContact.City;
-            Country = existingContact.Country;
-            Email = existingContact.Email;
-            PhoneNumber = existingContact.PhoneNumber;
-            WebsiteUrl = existingContact.WebsiteUrl;
-            TaxId = existingContact.TaxId;
-            TaxRate = existingContact.TaxRate;
+            LoadContact(existingContact);
         }
     }
 
-    [RelayCommand]
-    private async Task Save(Window window)
+    private void LoadContact(ContactDto contact)
     {
-        var contact = new ContactDto
+        ContactId = contact.ContactId;
+        ContactType = contact.ContactType;
+        OrganizationName = contact.OrganizationName;
+        AddressLine1 = contact.AddressLine1;
+        AddressLine2 = contact.AddressLine2;
+        AddressLine3 = contact.AddressLine3;
+        PostalCode = contact.PostalCode;
+        City = contact.City;
+        Country = contact.Country;
+        Email = contact.Email;
+        PhoneNumber = contact.PhoneNumber;
+        WebsiteUrl = contact.WebsiteUrl;
+        TaxId = contact.TaxId;
+        TaxRate = contact.TaxRate;
+    }
+
+    [RelayCommand]
+    private async Task Save()
+    {
+        if (string.IsNullOrWhiteSpace(OrganizationName))
         {
-            ContactId = ContactId,
-            ContactType = ContactType,
-            OrganizationName = OrganizationName,
-            AddressLine1 = AddressLine1,
-            AddressLine2 = AddressLine2,
-            AddressLine3 = AddressLine3,
-            PostalCode = PostalCode,
-            City = City,
-            Country = Country,
-            Email = Email,
-            PhoneNumber = PhoneNumber,
-            WebsiteUrl = WebsiteUrl,
-            TaxId = TaxId,
-            TaxRate = TaxRate
-        };
+            StatusMessage = "Organization name is required";
+            return;
+        }
 
         try
         {
+            var contact = new ContactDto
+            {
+                ContactId = ContactId,
+                ContactType = ContactType,
+                OrganizationName = OrganizationName,
+                AddressLine1 = AddressLine1,
+                AddressLine2 = AddressLine2,
+                AddressLine3 = AddressLine3,
+                PostalCode = PostalCode,
+                City = City,
+                Country = Country,
+                Email = Email,
+                PhoneNumber = PhoneNumber,
+                WebsiteUrl = WebsiteUrl,
+                TaxId = TaxId,
+                TaxRate = TaxRate
+            };
+
+            bool success;
             if (_existingContact == null)
             {
-                await _contactService.AddContact(contact);
+                success = await _contactService.CreateContactAsync(contact);
             }
             else
             {
-                await _contactService.UpdateContact(contact);
+                success = await _contactService.UpdateContactAsync(contact);
             }
-            window.Close();
+
+            if (success)
+            {
+                _dialog.Close(contact);
+            }
+            else
+            {
+                StatusMessage = "Failed to save contact";
+            }
         }
         catch (Exception ex)
         {
-            await MessageBox.ShowDialog(_owner, "Error", $"Failed to save contact: {ex.Message}");
+            StatusMessage = $"Error saving contact: {ex.Message}";
         }
     }
 
     [RelayCommand]
-    private void Cancel(Window window)
+    private void Cancel()
     {
-        window.Close();
+        _dialog.Close(null);
     }
 } 

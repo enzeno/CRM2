@@ -34,6 +34,12 @@
                         Height="40"
                         Margin="0,5"/>
                 
+                <Button Content="Quotations" 
+                        Command="{Binding NavigateToQuotationsCommand}"
+                        HorizontalAlignment="Stretch"
+                        Height="40"
+                        Margin="0,5"/>
+                
                 <Button Content="Invoices" 
                         Command="{Binding NavigateToInvoicesCommand}"
                         HorizontalAlignment="Stretch"

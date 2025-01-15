@@ -1,6 +1,4 @@
-using System;
-
-namespace CRM2.Desktop.Features.Contacts;
+namespace CRM2.API.Models;
 
 public class ContactDto
 {

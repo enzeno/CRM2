@@ -1,0 +1,47 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:CRM2.Desktop.Features.Quotations"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="CRM2.Desktop.Features.Quotations.QuotationsView"
+             x:DataType="vm:QuotationsViewModel">
+    <DockPanel>
+        <StackPanel DockPanel.Dock="Top" Margin="10">
+            <TextBlock Text="{Binding StatusMessage}" 
+                       Foreground="{Binding StatusMessage, Converter={x:Static vm:StatusToColorConverter.Instance}}"
+                       IsVisible="{Binding StatusMessage, Converter={x:Static vm:StringNotEmptyConverter.Instance}}"/>
+            <TextBox Text="{Binding SearchText}" Watermark="Search quotations..." Margin="0,10,0,10"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="5">
+                <Button Content="Create New Quote" Command="{Binding CreateQuoteCommand}"/>
+                <Button Content="Edit" 
+                        Command="{Binding EditQuoteCommand}" 
+                        CommandParameter="{Binding SelectedQuote}"
+                        IsEnabled="{Binding SelectedQuote, Converter={x:Static ObjectConverters.IsNotNull}}"/>
+                <Button Content="Delete" 
+                        Command="{Binding DeleteQuoteCommand}" 
+                        CommandParameter="{Binding SelectedQuote}"
+                        IsEnabled="{Binding SelectedQuote, Converter={x:Static ObjectConverters.IsNotNull}}"/>
+            </StackPanel>
+        </StackPanel>
+
+        <DataGrid ItemsSource="{Binding Quotes}"
+                  SelectedItem="{Binding SelectedQuote}"
+                  IsReadOnly="True"
+                  GridLinesVisibility="All"
+                  BorderThickness="1"
+                  BorderBrush="Gray"
+                  Margin="10">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Quote ID" Binding="{Binding QuoteId}"/>
+                <DataGridTextColumn Header="Customer" Binding="{Binding CustomerName}"/>
+                <DataGridTextColumn Header="Status" Binding="{Binding Status}"/>
+                <DataGridTextColumn Header="Currency" Binding="{Binding CurrencyCode}"/>
+                <DataGridTextColumn Header="Created By" Binding="{Binding CreatedBy}"/>
+                <DataGridTextColumn Header="Created At" Binding="{Binding CreatedAt}"/>
+                <DataGridTextColumn Header="Last Modified By" Binding="{Binding LastModifiedBy}"/>
+                <DataGridTextColumn Header="Updated At" Binding="{Binding UpdatedAt}"/>
+            </DataGrid.Columns>
+        </DataGrid>
+    </DockPanel>
+</UserControl> 

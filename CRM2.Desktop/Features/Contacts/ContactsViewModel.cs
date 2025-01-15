@@ -1,199 +1,129 @@
+using System;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
-using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using CRM2.Desktop.Features.Shared;
-using System;
+using Avalonia.Controls;
 using System.Linq;
 using System.Collections.Generic;
-using Microsoft.Extensions.Configuration;
 
 namespace CRM2.Desktop.Features.Contacts;
 
 public partial class ContactsViewModel : ObservableObject
 {
-    private readonly ContactService _contactService;
-    private readonly Window _owner;
-    private List<ContactViewModel> _allContacts = new();
-
+    private readonly IContactService _contactService;
+    private readonly Window _parentWindow;
+    private List<ContactDto> _allContacts = new();
+    
     [ObservableProperty]
-    private ObservableCollection<ContactViewModel> _contacts = new();
-
-    [ObservableProperty]
-    private ContactViewModel? _selectedContact;
-
     private string _searchText = string.Empty;
-    public string SearchText
-    {
-        get => _searchText;
-        set
-        {
-            if (SetProperty(ref _searchText, value))
-            {
-                FilterContacts();
-            }
-        }
-    }
-
+    
     [ObservableProperty]
     private string _statusMessage = string.Empty;
+    
+    [ObservableProperty]
+    private ContactDto? _selectedContact;
+    
+    public ObservableCollection<ContactDto> Contacts { get; } = new();
 
-    public ContactsViewModel(Window owner)
+    partial void OnSearchTextChanged(string value)
     {
-        Console.WriteLine("[ContactsViewModel] Initializing");
-        _owner = owner;
-        try
-        {
-            Console.WriteLine("[ContactsViewModel] Getting connection string from configuration");
-            var connectionString = ConfigurationService.Configuration.GetConnectionString("DefaultConnection");
-            if (connectionString == null)
-            {
-                Console.WriteLine("[ContactsViewModel] Connection string is null");
-                throw new InvalidOperationException("Connection string not found");
-            }
-            Console.WriteLine("[ContactsViewModel] Creating ContactService");
-            _contactService = new ContactService(connectionString);
-            
-            // Load contacts
-            Console.WriteLine("[ContactsViewModel] Loading initial contacts");
-            LoadContactsCommand.Execute(null);
-            StatusMessage = "Connected to database successfully";
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"[ContactsViewModel] Error in constructor: {ex.Message}");
-            Console.WriteLine($"[ContactsViewModel] Stack trace: {ex.StackTrace}");
-            StatusMessage = $"Error connecting to database: {ex.Message}";
-            throw;
-        }
+        FilterContacts();
     }
-
+    
     private void FilterContacts()
     {
-        if (string.IsNullOrWhiteSpace(SearchText))
+        var searchTerms = (SearchText ?? string.Empty)
+            .ToLower()
+            .Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)
+            .Select(term => term.Trim())
+            .Where(term => !string.IsNullOrWhiteSpace(term))
+            .ToList();
+
+        var filtered = _allContacts;
+        
+        if (searchTerms.Any())
         {
-            Contacts = new ObservableCollection<ContactViewModel>(_allContacts);
-            return;
+            filtered = _allContacts.Where(contact =>
+                searchTerms.All(term =>
+                    contact.ContactId.ToLower().Contains(term) ||
+                    contact.ContactType.ToLower().Contains(term) ||
+                    (contact.OrganizationName?.ToLower().Contains(term) == true) ||
+                    (contact.AddressLine1?.ToLower().Contains(term) == true) ||
+                    (contact.AddressLine2?.ToLower().Contains(term) == true) ||
+                    (contact.City?.ToLower().Contains(term) == true) ||
+                    (contact.PostalCode?.ToLower().Contains(term) == true) ||
+                    (contact.Country?.ToLower().Contains(term) == true) ||
+                    (contact.Email?.ToLower().Contains(term) == true) ||
+                    (contact.PhoneNumber?.ToLower().Contains(term) == true) ||
+                    (contact.TaxId?.ToLower().Contains(term) == true)
+                )
+            ).ToList();
         }
 
-        var searchTerms = SearchText.ToLower().Split(' ', StringSplitOptions.RemoveEmptyEntries);
-        var filteredContacts = _allContacts.Where(contact =>
+        Contacts.Clear();
+        foreach (var contact in filtered)
         {
-            var searchableText = string.Join(" ", new[]
-            {
-                contact.ContactType,
-                contact.OrganizationName,
-                contact.Email,
-                contact.PhoneNumber,
-                contact.City,
-                contact.Country,
-                contact.TaxId
-            }).ToLower();
-
-            return searchTerms.All(term => searchableText.Contains(term));
-        });
-
-        Contacts = new ObservableCollection<ContactViewModel>(filteredContacts);
+            Contacts.Add(contact);
+        }
+        
+        StatusMessage = $"Found {Contacts.Count} contacts";
     }
-
-    [RelayCommand]
-    private async Task AddContact()
+    
+    public ContactsViewModel(IContactService contactService, Window parentWindow)
     {
-        Console.WriteLine("[ContactsViewModel] Adding new contact");
-        try
-        {
-            await ContactDialog.ShowDialog(_owner, _contactService);
-            await LoadContacts();
-            StatusMessage = "Contact added successfully";
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"[ContactsViewModel] Error adding contact: {ex.Message}");
-            Console.WriteLine($"[ContactsViewModel] Stack trace: {ex.StackTrace}");
-            StatusMessage = $"Error adding contact: {ex.Message}";
-            await MessageBox.ShowDialog(_owner, "Error", $"Failed to add contact: {ex.Message}");
-        }
+        _contactService = contactService;
+        _parentWindow = parentWindow;
+        _ = LoadContactsAsync();
     }
-
-    [RelayCommand]
-    private async Task EditContact(ContactViewModel contact)
+    
+    private async Task LoadContactsAsync()
     {
         try
         {
-            var contacts = await _contactService.GetContacts();
-            var existingContact = contacts.FirstOrDefault(c => c.ContactId == contact.ContactId);
-            if (existingContact == null) return;
-
-            await ContactDialog.ShowDialog(_owner, _contactService, existingContact);
-            await LoadContacts();
-            StatusMessage = "Contact updated successfully";
-        }
-        catch (Exception ex)
-        {
-            StatusMessage = $"Error updating contact: {ex.Message}";
-            await MessageBox.ShowDialog(_owner, "Error", $"Failed to update contact: {ex.Message}");
-        }
-    }
-
-    [RelayCommand]
-    private async Task DeleteContact(ContactViewModel contact)
-    {
-        try
-        {
-            var confirmed = await MessageBox.ShowDialog(
-                _owner,
-                "Confirm Delete",
-                $"Are you sure you want to delete {contact.OrganizationName}?",
-                true);
-
-            if (!confirmed) return;
-
-            await _contactService.DeleteContact(contact.ContactId);
-            _allContacts.Remove(contact);
+            var contacts = await _contactService.GetContactsAsync();
+            _allContacts = contacts.ToList();
             FilterContacts();
+            StatusMessage = "Contacts loaded successfully";
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Error loading contacts: {ex.Message}";
+        }
+    }
+    
+    [RelayCommand]
+    private async Task CreateContactAsync()
+    {
+        var dialog = new ContactDialog(_contactService, _parentWindow);
+        await dialog.ShowDialog(_parentWindow);
+        await LoadContactsAsync();
+    }
+    
+    [RelayCommand]
+    private async Task EditContactAsync(ContactDto contact)
+    {
+        var dialog = new ContactDialog(_contactService, _parentWindow);
+        dialog.DataContext = new ContactDialogViewModel(_contactService, dialog, contact);
+        await dialog.ShowDialog(_parentWindow);
+        await LoadContactsAsync();
+    }
+    
+    [RelayCommand]
+    private async Task DeleteContactAsync(ContactDto? contact)
+    {
+        if (contact == null) return;
+
+        try
+        {
+            // TODO: Add confirmation dialog
+            await _contactService.DeleteContactAsync(contact.ContactId);
+            Contacts.Remove(contact);
             StatusMessage = "Contact deleted successfully";
         }
         catch (Exception ex)
         {
             StatusMessage = $"Error deleting contact: {ex.Message}";
-            await MessageBox.ShowDialog(_owner, "Error", $"Failed to delete contact: {ex.Message}");
-        }
-    }
-
-    [RelayCommand]
-    private async Task LoadContacts()
-    {
-        try
-        {
-            var contacts = await _contactService.GetContacts();
-            _allContacts = contacts.Select(contact => new ContactViewModel
-            {
-                ContactId = contact.ContactId,
-                ContactType = contact.ContactType,
-                OrganizationName = contact.OrganizationName,
-                AddressLine1 = contact.AddressLine1,
-                AddressLine2 = contact.AddressLine2,
-                AddressLine3 = contact.AddressLine3,
-                PostalCode = contact.PostalCode,
-                City = contact.City,
-                Country = contact.Country,
-                Email = contact.Email,
-                PhoneNumber = contact.PhoneNumber,
-                WebsiteUrl = contact.WebsiteUrl,
-                TaxId = contact.TaxId,
-                TaxRate = contact.TaxRate,
-                CreatedAt = contact.CreatedAt,
-                UpdatedAt = contact.UpdatedAt
-            }).ToList();
-
-            FilterContacts();
-            StatusMessage = $"Loaded {contacts.Count} contacts";
-        }
-        catch (Exception ex)
-        {
-            StatusMessage = $"Error loading contacts: {ex.Message}";
-            await MessageBox.ShowDialog(_owner, "Error", $"Failed to load contacts: {ex.Message}");
         }
     }
 } 

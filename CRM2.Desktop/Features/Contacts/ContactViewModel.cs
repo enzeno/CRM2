@@ -47,12 +47,6 @@ public partial class ContactViewModel : ObservableObject
     [ObservableProperty]
     private decimal taxRate;
 
-    [ObservableProperty]
-    private DateTime createdAt;
-
-    [ObservableProperty]
-    private DateTime updatedAt;
-
     public ContactViewModel()
     {
     }
@@ -73,7 +67,23 @@ public partial class ContactViewModel : ObservableObject
         websiteUrl = contact.WebsiteUrl;
         taxId = contact.TaxId;
         taxRate = contact.TaxRate;
-        createdAt = contact.CreatedAt;
-        updatedAt = contact.UpdatedAt;
+    }
+
+    private void LoadContact(ContactDto contact)
+    {
+        ContactId = contact.ContactId;
+        ContactType = contact.ContactType;
+        OrganizationName = contact.OrganizationName;
+        AddressLine1 = contact.AddressLine1;
+        AddressLine2 = contact.AddressLine2;
+        AddressLine3 = contact.AddressLine3;
+        PostalCode = contact.PostalCode;
+        City = contact.City;
+        Country = contact.Country;
+        Email = contact.Email;
+        PhoneNumber = contact.PhoneNumber;
+        WebsiteUrl = contact.WebsiteUrl;
+        TaxId = contact.TaxId;
+        TaxRate = contact.TaxRate;
     }
 } 

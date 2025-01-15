@@ -2,7 +2,7 @@ using System;
 
 namespace CRM2.Desktop.Features.Contacts;
 
-public class ContactDto
+public class Contact
 {
     public string ContactId { get; set; } = string.Empty;
     public string ContactType { get; set; } = string.Empty;
@@ -18,4 +18,6 @@ public class ContactDto
     public string? WebsiteUrl { get; set; }
     public string TaxId { get; set; } = string.Empty;
     public decimal TaxRate { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; }
 } 

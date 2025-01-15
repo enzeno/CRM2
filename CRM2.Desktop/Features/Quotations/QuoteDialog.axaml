@@ -1,0 +1,112 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="using:CRM2.Desktop.Features.Quotations"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
+        x:Class="CRM2.Desktop.Features.Quotations.QuoteDialog"
+        x:DataType="vm:QuoteDialogViewModel"
+        Title="{Binding Title}"
+        Width="900" Height="700"
+        WindowStartupLocation="CenterOwner">
+
+    <DockPanel Margin="20">
+        <!-- Status Message -->
+        <TextBlock DockPanel.Dock="Top" 
+                  Text="{Binding StatusMessage}"
+                  Foreground="{Binding StatusMessage, Converter={x:Static vm:StatusToColorConverter.Instance}}"
+                  IsVisible="{Binding StatusMessage, Converter={x:Static vm:StringNotEmptyConverter.Instance}}"
+                  Margin="0,0,0,10"/>
+
+        <!-- Bottom Buttons -->
+        <StackPanel DockPanel.Dock="Bottom" 
+                   Orientation="Horizontal" 
+                   HorizontalAlignment="Right" 
+                   Spacing="10" 
+                   Margin="0,20,0,0">
+            <Button Content="Save" Command="{Binding SaveCommand}"/>
+            <Button Content="Cancel" Command="{Binding CancelCommand}"/>
+        </StackPanel>
+
+        <!-- Main Content -->
+        <ScrollViewer>
+            <StackPanel Spacing="15">
+                <!-- Customer Selection -->
+                <StackPanel>
+                    <TextBlock Text="Customer" FontWeight="Bold"/>
+                    <ComboBox ItemsSource="{Binding Customers}"
+                            SelectedItem="{Binding SelectedCustomer}"
+                            Width="300"
+                            HorizontalAlignment="Left">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding OrganizationName}"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </StackPanel>
+
+                <!-- Currency -->
+                <StackPanel>
+                    <TextBlock Text="Currency" FontWeight="Bold"/>
+                    <ComboBox ItemsSource="{Binding CurrencyCodes}"
+                            SelectedItem="{Binding CurrencyCode}"
+                            Width="100"
+                            HorizontalAlignment="Left"/>
+                </StackPanel>
+
+                <!-- Comments -->
+                <StackPanel>
+                    <TextBlock Text="Customer Comments" FontWeight="Bold"/>
+                    <TextBox Text="{Binding CustomerComments}"
+                            Height="60"
+                            AcceptsReturn="True"
+                            TextWrapping="Wrap"/>
+                </StackPanel>
+
+                <StackPanel>
+                    <TextBlock Text="Internal Comments" FontWeight="Bold"/>
+                    <TextBox Text="{Binding InternalComments}"
+                            Height="60"
+                            AcceptsReturn="True"
+                            TextWrapping="Wrap"/>
+                </StackPanel>
+
+                <!-- Line Items -->
+                <StackPanel>
+                    <TextBlock Text="Line Items" FontWeight="Bold"/>
+                    <StackPanel Orientation="Horizontal" 
+                              HorizontalAlignment="Right" 
+                              Spacing="5" 
+                              Margin="0,5">
+                        <Button Content="Add Item" Command="{Binding AddLineItemCommand}"/>
+                        <Button Content="Edit Item" 
+                                Command="{Binding EditLineItemCommand}"
+                                CommandParameter="{Binding SelectedLineItem}"
+                                IsEnabled="{Binding SelectedLineItem, Converter={x:Static ObjectConverters.IsNotNull}}"/>
+                        <Button Content="Remove Item" 
+                                Command="{Binding RemoveLineItemCommand}"
+                                CommandParameter="{Binding SelectedLineItem}"
+                                IsEnabled="{Binding SelectedLineItem, Converter={x:Static ObjectConverters.IsNotNull}}"/>
+                    </StackPanel>
+
+                    <DataGrid ItemsSource="{Binding LineItems}"
+                            SelectedItem="{Binding SelectedLineItem}"
+                            AutoGenerateColumns="False"
+                            IsReadOnly="True"
+                            Height="200">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Line #" Binding="{Binding LineNumber}"/>
+                            <DataGridTextColumn Header="Part Number" Binding="{Binding PartNumber}"/>
+                            <DataGridTextColumn Header="Description" Binding="{Binding Description}"/>
+                            <DataGridTextColumn Header="Quantity" Binding="{Binding Quantity}"/>
+                            <DataGridTextColumn Header="Sell Price" Binding="{Binding SellPrice, StringFormat={}{0:N2}}"/>
+                            <DataGridTextColumn Header="Total" Binding="{Binding Total, StringFormat={}{0:N2}}"/>
+                            <DataGridTextColumn Header="Currency" Binding="{Binding CurrencyCode}"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </StackPanel>
+            </StackPanel>
+        </ScrollViewer>
+    </DockPanel>
+</Window> 

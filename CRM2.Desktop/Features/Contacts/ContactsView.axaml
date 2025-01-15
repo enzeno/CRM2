@@ -12,7 +12,17 @@
                        Foreground="{Binding StatusMessage, Converter={x:Static vm:StatusToColorConverter.Instance}}"
                        IsVisible="{Binding StatusMessage, Converter={x:Static vm:StringNotEmptyConverter.Instance}}"/>
             <TextBox Text="{Binding SearchText}" Watermark="Search contacts..." Margin="0,10,0,10"/>
-            <Button Content="Add Contact" Command="{Binding AddContactCommand}" HorizontalAlignment="Right"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="5">
+                <Button Content="Add Contact" Command="{Binding CreateContactCommand}"/>
+                <Button Content="Edit Contact" 
+                        Command="{Binding EditContactCommand}" 
+                        CommandParameter="{Binding SelectedContact}"
+                        IsEnabled="{Binding SelectedContact, Converter={x:Static ObjectConverters.IsNotNull}}"/>
+                <Button Content="Delete Contact" 
+                        Command="{Binding DeleteContactCommand}" 
+                        CommandParameter="{Binding SelectedContact}"
+                        IsEnabled="{Binding SelectedContact, Converter={x:Static ObjectConverters.IsNotNull}}"/>
+            </StackPanel>
         </StackPanel>
 
         <DataGrid ItemsSource="{Binding Contacts}"
@@ -33,21 +43,6 @@
                 <DataGridTextColumn Header="Phone" Binding="{Binding PhoneNumber}"/>
                 <DataGridTextColumn Header="Tax ID" Binding="{Binding TaxId}"/>
                 <DataGridTextColumn Header="Tax Rate" Binding="{Binding TaxRate, StringFormat={}{0:P2}}"/>
-                
-                <DataGridTemplateColumn Header="Actions" Width="100">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <StackPanel Orientation="Horizontal" Spacing="5">
-                                <Button Content="Edit"
-                                        Command="{Binding $parent[DataGrid].((vm:ContactsViewModel)DataContext).EditContactCommand}"
-                                        CommandParameter="{Binding}"/>
-                                <Button Content="Delete"
-                                        Command="{Binding $parent[DataGrid].((vm:ContactsViewModel)DataContext).DeleteContactCommand}"
-                                        CommandParameter="{Binding}"/>
-                            </StackPanel>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
     </DockPanel>
