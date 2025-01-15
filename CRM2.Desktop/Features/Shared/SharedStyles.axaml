@@ -1,0 +1,425 @@
+<!-- Styles -->
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- Color Palette -->
+    <Styles.Resources>
+        <ResourceDictionary>
+            <!-- Softer, more professional colors -->
+            <Color x:Key="PrimaryColor">#4A90E2</Color>
+            <Color x:Key="PrimaryLightColor">#6AA9F4</Color>
+            <Color x:Key="PrimaryDarkColor">#3B73B5</Color>
+            <Color x:Key="SuccessColor">#66BB6A</Color>
+            <Color x:Key="SuccessLightColor">#81C784</Color>
+            <Color x:Key="SuccessDarkColor">#4CAF50</Color>
+            <Color x:Key="DangerColor">#EF5350</Color>
+            <Color x:Key="DangerLightColor">#FF7373</Color>
+            <Color x:Key="DangerDarkColor">#D32F2F</Color>
+            <Color x:Key="WarningColor">#FFB74D</Color>
+            <Color x:Key="GrayColor">#9E9E9E</Color>
+            <Color x:Key="GrayLightColor">#BDBDBD</Color>
+            <Color x:Key="GrayDarkColor">#757575</Color>
+            <Color x:Key="BackgroundColor">#F8F9FA</Color>
+            <Color x:Key="TextColor">#424242</Color>
+            <Color x:Key="BorderColor">#E0E0E0</Color>
+            <Color x:Key="CardBackgroundColor">White</Color>
+            <Color x:Key="PopupBackgroundColor">White</Color>
+            <Color x:Key="HoverBackgroundColor">#F5F7FA</Color>
+            <Color x:Key="SelectedBackgroundColor">#EBF3FB</Color>
+
+            <!-- Brushes -->
+            <SolidColorBrush x:Key="PrimaryBrush" Color="{StaticResource PrimaryColor}"/>
+            <SolidColorBrush x:Key="PrimaryLightBrush" Color="{StaticResource PrimaryLightColor}"/>
+            <SolidColorBrush x:Key="PrimaryDarkBrush" Color="{StaticResource PrimaryDarkColor}"/>
+            <SolidColorBrush x:Key="SuccessBrush" Color="{StaticResource SuccessColor}"/>
+            <SolidColorBrush x:Key="SuccessLightBrush" Color="{StaticResource SuccessLightColor}"/>
+            <SolidColorBrush x:Key="SuccessDarkBrush" Color="{StaticResource SuccessDarkColor}"/>
+            <SolidColorBrush x:Key="DangerBrush" Color="{StaticResource DangerColor}"/>
+            <SolidColorBrush x:Key="DangerLightBrush" Color="{StaticResource DangerLightColor}"/>
+            <SolidColorBrush x:Key="DangerDarkBrush" Color="{StaticResource DangerDarkColor}"/>
+            <SolidColorBrush x:Key="WarningBrush" Color="{StaticResource WarningColor}"/>
+            <SolidColorBrush x:Key="GrayBrush" Color="{StaticResource GrayColor}"/>
+            <SolidColorBrush x:Key="GrayLightBrush" Color="{StaticResource GrayLightColor}"/>
+            <SolidColorBrush x:Key="GrayDarkBrush" Color="{StaticResource GrayDarkColor}"/>
+            <SolidColorBrush x:Key="BackgroundBrush" Color="{StaticResource BackgroundColor}"/>
+            <SolidColorBrush x:Key="TextBrush" Color="{StaticResource TextColor}"/>
+            <SolidColorBrush x:Key="BorderBrush" Color="{StaticResource BorderColor}"/>
+            <SolidColorBrush x:Key="CardBackgroundBrush" Color="{StaticResource CardBackgroundColor}"/>
+            <SolidColorBrush x:Key="PopupBackgroundBrush" Color="{StaticResource PopupBackgroundColor}"/>
+            <SolidColorBrush x:Key="HoverBackgroundBrush" Color="{StaticResource HoverBackgroundColor}"/>
+            <SolidColorBrush x:Key="SelectedBackgroundBrush" Color="{StaticResource SelectedBackgroundColor}"/>
+        </ResourceDictionary>
+    </Styles.Resources>
+
+    <!-- Button Base Style -->
+    <Style Selector="Button">
+        <Setter Property="Background" Value="{DynamicResource PrimaryBrush}"/>
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Padding" Value="15,8"/>
+        <Setter Property="CornerRadius" Value="4"/>
+        <Setter Property="FontWeight" Value="Medium"/>
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="Transitions">
+            <Transitions>
+                <BrushTransition Property="Background" Duration="0:0:0.2"/>
+                <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.2"/>
+            </Transitions>
+        </Setter>
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border Name="PART_ButtonBorder"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="{TemplateBinding CornerRadius}">
+                    <ContentPresenter Name="PART_ContentPresenter"
+                                    Content="{TemplateBinding Content}"
+                                    ContentTemplate="{TemplateBinding ContentTemplate}"
+                                    Padding="{TemplateBinding Padding}"
+                                    HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                    VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+
+    <!-- Button States -->
+    <Style Selector="Button:pointerover /template/ Border#PART_ButtonBorder">
+        <Setter Property="BoxShadow" Value="0 4 8 0 #25000000"/>
+    </Style>
+
+    <Style Selector="Button:pointerover">
+        <Setter Property="Background" Value="{DynamicResource PrimaryLightBrush}"/>
+        <Setter Property="RenderTransform" Value="scale(1.02)"/>
+        <Setter Property="Cursor" Value="Hand"/>
+    </Style>
+
+    <Style Selector="Button:pressed /template/ Border#PART_ButtonBorder">
+        <Setter Property="BoxShadow" Value="0 2 4 0 #15000000"/>
+    </Style>
+
+    <Style Selector="Button:pressed">
+        <Setter Property="RenderTransform" Value="scale(0.98)"/>
+    </Style>
+
+    <Style Selector="Button:disabled">
+        <Setter Property="Opacity" Value="0.6"/>
+        <Setter Property="RenderTransform" Value="none"/>
+    </Style>
+
+    <Style Selector="Button:disabled /template/ Border#PART_ButtonBorder">
+        <Setter Property="BoxShadow" Value="none"/>
+    </Style>
+
+    <!-- Success Button -->
+    <Style Selector="Button.success">
+        <Setter Property="Background" Value="{DynamicResource SuccessBrush}"/>
+    </Style>
+
+    <Style Selector="Button.success:pointerover">
+        <Setter Property="Background" Value="{DynamicResource SuccessLightBrush}"/>
+    </Style>
+
+    <Style Selector="Button.success:pressed">
+        <Setter Property="Background" Value="{DynamicResource SuccessDarkBrush}"/>
+    </Style>
+
+    <!-- Danger Button -->
+    <Style Selector="Button.danger">
+        <Setter Property="Background" Value="{DynamicResource DangerBrush}"/>
+    </Style>
+
+    <Style Selector="Button.danger:pointerover">
+        <Setter Property="Background" Value="{DynamicResource DangerLightBrush}"/>
+    </Style>
+
+    <Style Selector="Button.danger:pressed">
+        <Setter Property="Background" Value="{DynamicResource DangerDarkBrush}"/>
+    </Style>
+
+    <!-- Gray Button -->
+    <Style Selector="Button.gray">
+        <Setter Property="Background" Value="{DynamicResource GrayBrush}"/>
+    </Style>
+
+    <Style Selector="Button.gray:pointerover">
+        <Setter Property="Background" Value="{DynamicResource GrayLightBrush}"/>
+    </Style>
+
+    <Style Selector="Button.gray:pressed">
+        <Setter Property="Background" Value="{DynamicResource GrayDarkBrush}"/>
+    </Style>
+
+    <!-- Outline Button -->
+    <Style Selector="Button.outline">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource PrimaryBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Foreground" Value="{DynamicResource PrimaryBrush}"/>
+    </Style>
+
+    <Style Selector="Button.outline:pointerover">
+        <Setter Property="Background" Value="{DynamicResource PrimaryBrush}"/>
+        <Setter Property="Foreground" Value="White"/>
+    </Style>
+
+    <!-- Navigation Button -->
+    <Style Selector="Button.nav">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Padding" Value="15"/>
+        <Setter Property="HorizontalContentAlignment" Value="Left"/>
+        <Setter Property="CornerRadius" Value="4"/>
+    </Style>
+
+    <Style Selector="Button.nav:pointerover">
+        <Setter Property="Background" Value="#15000000"/>
+        <Setter Property="RenderTransform" Value="none"/>
+    </Style>
+
+    <Style Selector="Button.nav:pressed">
+        <Setter Property="Background" Value="#25000000"/>
+        <Setter Property="RenderTransform" Value="none"/>
+    </Style>
+
+    <!-- ComboBox Styles -->
+    <Style Selector="ComboBox">
+        <Setter Property="Height" Value="38"/>
+        <Setter Property="CornerRadius" Value="4"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
+        <Setter Property="Background" Value="{DynamicResource CardBackgroundBrush}"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+        <Setter Property="Padding" Value="10,6"/>
+        <Setter Property="MaxDropDownHeight" Value="400"/>
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border Name="border"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="{TemplateBinding CornerRadius}">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <ContentPresenter Name="ContentPresenter"
+                                        Grid.Column="0"
+                                        Content="{TemplateBinding SelectionBoxItem}"
+                                        ContentTemplate="{TemplateBinding ItemTemplate}"
+                                        Padding="{TemplateBinding Padding}"
+                                        VerticalContentAlignment="Center"/>
+                        <Border Name="splitBorder"
+                                Grid.Column="1"
+                                Width="30"
+                                IsVisible="{TemplateBinding IsDropDownOpen}"
+                                BorderBrush="{DynamicResource BorderBrush}"
+                                BorderThickness="0,0,0,0">
+                            <Path Name="arrow"
+                                  Fill="{DynamicResource TextBrush}"
+                                  Width="8"
+                                  Height="4"
+                                  Stretch="Uniform"
+                                  HorizontalAlignment="Center"
+                                  VerticalAlignment="Center"
+                                  Data="M0,0 L3,4 L6,0 Z"/>
+                        </Border>
+                        <Popup Name="PART_Popup"
+                               IsOpen="{TemplateBinding IsDropDownOpen, Mode=TwoWay}"
+                               MinWidth="{Binding Bounds.Width, RelativeSource={RelativeSource TemplatedParent}}"
+                               MaxHeight="{TemplateBinding MaxDropDownHeight}"
+                               PlacementTarget="{TemplateBinding}"
+                               IsLightDismissEnabled="True">
+                            <Border Background="{DynamicResource PopupBackgroundBrush}"
+                                    BorderBrush="{DynamicResource BorderBrush}"
+                                    BorderThickness="1"
+                                    Margin="0,4,0,0"
+                                    CornerRadius="4"
+                                    BoxShadow="0 4 8 0 #20000000">
+                                <ScrollViewer>
+                                    <ItemsPresenter Name="PART_ItemsPresenter"
+                                                  ItemsPanel="{TemplateBinding ItemsPanel}"/>
+                                </ScrollViewer>
+                            </Border>
+                        </Popup>
+                    </Grid>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+
+    <Style Selector="ComboBox /template/ Border#border">
+        <Setter Property="Background" Value="{DynamicResource CardBackgroundBrush}"/>
+    </Style>
+
+    <Style Selector="ComboBox:pointerover /template/ Border#border">
+        <Setter Property="Background" Value="{DynamicResource HoverBackgroundBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource PrimaryBrush}"/>
+    </Style>
+
+    <Style Selector="ComboBox:focus /template/ Border#border">
+        <Setter Property="BorderBrush" Value="{DynamicResource PrimaryBrush}"/>
+        <Setter Property="BorderThickness" Value="2"/>
+    </Style>
+
+    <Style Selector="ComboBoxItem">
+        <Setter Property="Padding" Value="10,8"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border Name="PART_Border"
+                        Background="{TemplateBinding Background}"
+                        BorderThickness="0"
+                        CornerRadius="4">
+                    <ContentPresenter Name="PART_ContentPresenter"
+                                    Content="{TemplateBinding Content}"
+                                    ContentTemplate="{TemplateBinding ContentTemplate}"
+                                    Padding="{TemplateBinding Padding}"
+                                    HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
+                                    VerticalAlignment="{TemplateBinding VerticalAlignment}"/>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+
+    <Style Selector="ComboBoxItem:pointerover /template/ Border#PART_Border">
+        <Setter Property="Background" Value="{DynamicResource HoverBackgroundBrush}"/>
+    </Style>
+
+    <Style Selector="ComboBoxItem:selected /template/ Border#PART_Border">
+        <Setter Property="Background" Value="{DynamicResource SelectedBackgroundBrush}"/>
+    </Style>
+
+    <Style Selector="ComboBoxItem:selected">
+        <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+    </Style>
+
+    <!-- TextBox Styles -->
+    <Style Selector="TextBox">
+        <Setter Property="Height" Value="38"/>
+        <Setter Property="CornerRadius" Value="4"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
+        <Setter Property="Background" Value="{DynamicResource CardBackgroundBrush}"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+        <Setter Property="Padding" Value="10,6"/>
+        <Setter Property="SelectionBrush" Value="{DynamicResource PrimaryLightBrush}"/>
+        <Setter Property="SelectionForegroundBrush" Value="{DynamicResource TextBrush}"/>
+        <Setter Property="CaretBrush" Value="{DynamicResource TextBrush}"/>
+    </Style>
+
+    <Style Selector="TextBox:pointerover">
+        <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+    </Style>
+
+    <Style Selector="TextBox:pointerover /template/ Border">
+        <Setter Property="Background" Value="{DynamicResource HoverBackgroundBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource PrimaryBrush}"/>
+    </Style>
+
+    <Style Selector="TextBox:focus">
+        <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+    </Style>
+
+    <Style Selector="TextBox:focus /template/ Border">
+        <Setter Property="BorderBrush" Value="{DynamicResource PrimaryBrush}"/>
+        <Setter Property="BorderThickness" Value="2"/>
+        <Setter Property="Background" Value="{DynamicResource CardBackgroundBrush}"/>
+    </Style>
+
+    <!-- For multiline TextBox -->
+    <Style Selector="TextBox.multiline">
+        <Setter Property="AcceptsReturn" Value="True"/>
+        <Setter Property="TextWrapping" Value="Wrap"/>
+        <Setter Property="Height" Value="80"/>
+    </Style>
+
+    <!-- NumericUpDown Styles -->
+    <Style Selector="NumericUpDown">
+        <Setter Property="Height" Value="38"/>
+        <Setter Property="CornerRadius" Value="4"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
+        <Setter Property="Background" Value="{DynamicResource CardBackgroundBrush}"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+        <Setter Property="Padding" Value="10,6"/>
+    </Style>
+
+    <Style Selector="NumericUpDown:pointerover /template/ Border">
+        <Setter Property="Background" Value="{DynamicResource HoverBackgroundBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource PrimaryBrush}"/>
+    </Style>
+
+    <Style Selector="NumericUpDown:focus /template/ Border">
+        <Setter Property="BorderBrush" Value="{DynamicResource PrimaryBrush}"/>
+        <Setter Property="BorderThickness" Value="2"/>
+    </Style>
+
+    <!-- TextBlock Styles -->
+    <Style Selector="TextBlock">
+        <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+        <Setter Property="FontSize" Value="14"/>
+    </Style>
+
+    <Style Selector="TextBlock.h1">
+        <Setter Property="FontSize" Value="24"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+    </Style>
+
+    <Style Selector="TextBlock.h2">
+        <Setter Property="FontSize" Value="20"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+    </Style>
+
+    <!-- DataGrid Styles -->
+    <Style Selector="DataGrid">
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
+        <Setter Property="CornerRadius" Value="4"/>
+        <Setter Property="Background" Value="{DynamicResource CardBackgroundBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+    </Style>
+
+    <Style Selector="DataGridColumnHeader">
+        <Setter Property="Background" Value="{DynamicResource BackgroundBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Padding" Value="10"/>
+        <Setter Property="BorderThickness" Value="0,0,1,1"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
+    </Style>
+
+    <Style Selector="DataGridRow">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Padding" Value="4"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+    </Style>
+
+    <Style Selector="DataGridRow:pointerover">
+        <Setter Property="Background" Value="{DynamicResource HoverBackgroundBrush}"/>
+    </Style>
+
+    <Style Selector="DataGridRow:selected">
+        <Setter Property="Background" Value="{DynamicResource SelectedBackgroundBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+    </Style>
+
+    <Style Selector="DataGridCell">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Padding" Value="10,6"/>
+    </Style>
+
+    <!-- Card Style -->
+    <Style Selector="Border.card">
+        <Setter Property="Background" Value="White"/>
+        <Setter Property="CornerRadius" Value="8"/>
+        <Setter Property="BoxShadow" Value="0 2 8 0 #20000000"/>
+        <Setter Property="Padding" Value="20"/>
+        <Setter Property="Margin" Value="0,0,0,20"/>
+    </Style>
+</Styles> 

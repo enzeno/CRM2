@@ -8,110 +8,142 @@
         x:DataType="vm:LineItemDialogViewModel"
         Title="{Binding Title}"
         Width="500" Height="600"
-        WindowStartupLocation="CenterOwner">
+        Background="{StaticResource BackgroundBrush}"
+        WindowStartupLocation="CenterOwner"
+        ExtendClientAreaToDecorationsHint="True">
 
-    <DockPanel Margin="20">
-        <!-- Status Message -->
-        <TextBlock DockPanel.Dock="Top" 
-                  Text="{Binding StatusMessage}"
-                  Foreground="{Binding StatusMessage, Converter={x:Static vm:StatusToColorConverter.Instance}}"
-                  IsVisible="{Binding StatusMessage, Converter={x:Static vm:StringNotEmptyConverter.Instance}}"
-                  Margin="0,0,0,10"/>
+    <Window.Styles>
+        <StyleInclude Source="/Features/Shared/SharedStyles.axaml"/>
+    </Window.Styles>
 
-        <!-- Bottom Buttons -->
-        <StackPanel DockPanel.Dock="Bottom" 
-                   Orientation="Horizontal" 
-                   HorizontalAlignment="Right" 
-                   Spacing="10" 
-                   Margin="0,20,0,0">
-            <Button Content="Save" Command="{Binding SaveCommand}"/>
-            <Button Content="Cancel" Command="{Binding CancelCommand}"/>
-        </StackPanel>
+    <Border Margin="20" Background="White" CornerRadius="8" BoxShadow="0 2 8 0 #20000000">
+        <DockPanel Margin="20">
+            <!-- Status Message -->
+            <TextBlock DockPanel.Dock="Top" 
+                      Text="{Binding StatusMessage}"
+                      Foreground="{Binding StatusMessage, Converter={x:Static vm:StatusToColorConverter.Instance}}"
+                      IsVisible="{Binding StatusMessage, Converter={x:Static vm:StringNotEmptyConverter.Instance}}"
+                      Margin="0,0,0,15"/>
 
-        <!-- Main Content -->
-        <ScrollViewer>
-            <StackPanel Spacing="15">
-                <!-- Part Number -->
-                <StackPanel>
-                    <TextBlock Text="Part Number *" FontWeight="Bold"/>
-                    <TextBox Text="{Binding PartNumber}"
-                            Width="200"
-                            HorizontalAlignment="Left"/>
-                </StackPanel>
-
-                <!-- Alternative Part Number -->
-                <StackPanel>
-                    <TextBlock Text="Alternative Part Number" FontWeight="Bold"/>
-                    <TextBox Text="{Binding AlternativePartNumber}"
-                            Width="200"
-                            HorizontalAlignment="Left"/>
-                </StackPanel>
-
-                <!-- Description -->
-                <StackPanel>
-                    <TextBlock Text="Description *" FontWeight="Bold"/>
-                    <TextBox Text="{Binding Description}"
-                            Height="60"
-                            AcceptsReturn="True"
-                            TextWrapping="Wrap"/>
-                </StackPanel>
-
-                <!-- Quantity -->
-                <StackPanel>
-                    <TextBlock Text="Quantity *" FontWeight="Bold"/>
-                    <NumericUpDown Value="{Binding Quantity}"
-                                 Minimum="0.01"
-                                 Increment="1"
-                                 FormatString="F2"
-                                 Width="150"
-                                 HorizontalAlignment="Left"/>
-                </StackPanel>
-
-                <!-- Prices -->
-                <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto">
-                    <StackPanel Grid.Column="0" Grid.Row="0" Margin="0,0,10,0">
-                        <TextBlock Text="Sell Price *" FontWeight="Bold"/>
-                        <NumericUpDown Value="{Binding SellPrice}"
-                                     Minimum="0"
-                                     FormatString="C2"
-                                     Width="150"
-                                     HorizontalAlignment="Left"/>
-                    </StackPanel>
-
-                    <StackPanel Grid.Column="1" Grid.Row="0">
-                        <TextBlock Text="Buy Price *" FontWeight="Bold"/>
-                        <NumericUpDown Value="{Binding BuyPrice}"
-                                     Minimum="0"
-                                     FormatString="C2"
-                                     Width="150"
-                                     HorizontalAlignment="Left"/>
-                    </StackPanel>
-
-                    <StackPanel Grid.Column="0" Grid.Row="1" Margin="0,15,10,0">
-                        <TextBlock Text="Currency *" FontWeight="Bold"/>
-                        <ComboBox ItemsSource="{Binding CurrencyCodes}"
-                                SelectedItem="{Binding CurrencyCode}"
-                                Width="100"
-                                HorizontalAlignment="Left"/>
-                    </StackPanel>
-
-                    <StackPanel Grid.Column="1" Grid.Row="1" Margin="0,15,0,0">
-                        <TextBlock Text="Supplier Code" FontWeight="Bold"/>
-                        <TextBox Text="{Binding SupplierCode}"
-                                Width="150"
-                                HorizontalAlignment="Left"/>
-                    </StackPanel>
-                </Grid>
-
-                <!-- Comments -->
-                <StackPanel>
-                    <TextBlock Text="Comments" FontWeight="Bold"/>
-                    <TextBox Text="{Binding Comments}"
-                            Height="60"
-                            AcceptsReturn="True"
-                            TextWrapping="Wrap"/>
-                </StackPanel>
+            <!-- Bottom Buttons -->
+            <StackPanel DockPanel.Dock="Bottom" 
+                       Orientation="Horizontal" 
+                       HorizontalAlignment="Right" 
+                       Spacing="10" 
+                       Margin="0,20,0,0">
+                <Button Classes="success" Command="{Binding SaveCommand}">
+                    <Button.Content>
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <PathIcon Data="{StaticResource save_regular}" Width="16" Height="16"/>
+                            <TextBlock Text="Save"/>
+                        </StackPanel>
+                    </Button.Content>
+                </Button>
+                <Button Classes="gray" Command="{Binding CancelCommand}">
+                    <Button.Content>
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <PathIcon Data="{StaticResource dismiss_regular}" Width="16" Height="16"/>
+                            <TextBlock Text="Cancel"/>
+                        </StackPanel>
+                    </Button.Content>
+                </Button>
             </StackPanel>
-        </ScrollViewer>
-    </DockPanel>
+
+            <!-- Main Content -->
+            <ScrollViewer>
+                <StackPanel Spacing="20">
+                    <!-- Basic Information -->
+                    <Border Classes="card">
+                        <StackPanel>
+                            <TextBlock Text="Basic Information" Classes="h2" Margin="0,0,0,15"/>
+                            
+                            <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto" Margin="0,0,0,10">
+                                <TextBlock Text="Part Number *" Grid.Row="0" Grid.Column="0" Margin="0,0,15,10"/>
+                                <TextBox Grid.Row="0" Grid.Column="1" 
+                                        Text="{Binding PartNumber}"
+                                        Width="200"
+                                        HorizontalAlignment="Left"/>
+
+                                <TextBlock Text="Alternative Part Number" Grid.Row="1" Grid.Column="0" Margin="0,0,15,10"/>
+                                <TextBox Grid.Row="1" Grid.Column="1"
+                                        Text="{Binding AlternativePartNumber}"
+                                        Width="200"
+                                        HorizontalAlignment="Left"/>
+
+                                <TextBlock Text="Description *" Grid.Row="2" Grid.Column="0" Margin="0,0,15,10"/>
+                                <TextBox Grid.Row="2" Grid.Column="1"
+                                        Text="{Binding Description}"
+                                        Height="80"
+                                        AcceptsReturn="True"
+                                        TextWrapping="Wrap"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Pricing Information -->
+                    <Border Classes="card">
+                        <StackPanel>
+                            <TextBlock Text="Pricing Information" Classes="h2" Margin="0,0,0,15"/>
+                            
+                            <Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto,Auto" Margin="0,0,0,10">
+                                <TextBlock Text="Quantity *" Grid.Row="0" Grid.Column="0" Margin="0,0,15,10"/>
+                                <NumericUpDown Grid.Row="0" Grid.Column="1"
+                                             Value="{Binding Quantity}"
+                                             Minimum="0.01"
+                                             Increment="1"
+                                             FormatString="F2"
+                                             Width="150"
+                                             HorizontalAlignment="Left"/>
+
+                                <TextBlock Text="Currency *" Grid.Row="0" Grid.Column="2" Margin="20,0,15,10"/>
+                                <ComboBox Grid.Row="0" Grid.Column="3"
+                                        ItemsSource="{Binding CurrencyCodes}"
+                                        SelectedItem="{Binding CurrencyCode}"
+                                        Width="100"
+                                        HorizontalAlignment="Left"/>
+
+                                <TextBlock Text="Sell Price *" Grid.Row="1" Grid.Column="0" Margin="0,0,15,10"/>
+                                <NumericUpDown Grid.Row="1" Grid.Column="1"
+                                             Value="{Binding SellPrice}"
+                                             Minimum="0"
+                                             FormatString="C2"
+                                             Width="150"
+                                             HorizontalAlignment="Left"/>
+
+                                <TextBlock Text="Buy Price *" Grid.Row="1" Grid.Column="2" Margin="20,0,15,10"/>
+                                <NumericUpDown Grid.Row="1" Grid.Column="3"
+                                             Value="{Binding BuyPrice}"
+                                             Minimum="0"
+                                             FormatString="C2"
+                                             Width="150"
+                                             HorizontalAlignment="Left"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Additional Information -->
+                    <Border Classes="card">
+                        <StackPanel>
+                            <TextBlock Text="Additional Information" Classes="h2" Margin="0,0,0,15"/>
+                            
+                            <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto" Margin="0,0,0,10">
+                                <TextBlock Text="Supplier Code" Grid.Row="0" Grid.Column="0" Margin="0,0,15,10"/>
+                                <TextBox Grid.Row="0" Grid.Column="1"
+                                        Text="{Binding SupplierCode}"
+                                        Width="200"
+                                        HorizontalAlignment="Left"/>
+
+                                <TextBlock Text="Comments" Grid.Row="1" Grid.Column="0" Margin="0,0,15,10"/>
+                                <TextBox Grid.Row="1" Grid.Column="1"
+                                        Text="{Binding Comments}"
+                                        Height="80"
+                                        AcceptsReturn="True"
+                                        TextWrapping="Wrap"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+        </DockPanel>
+    </Border>
 </Window> 

@@ -73,7 +73,7 @@ public partial class LineItemDialogViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private async Task Save()
+    private void Save()
     {
         if (string.IsNullOrWhiteSpace(PartNumber))
         {

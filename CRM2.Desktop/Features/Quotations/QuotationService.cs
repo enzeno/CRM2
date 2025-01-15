@@ -8,14 +8,23 @@ namespace CRM2.Desktop.Features.Quotations;
 
 public class QuotationService : IQuotationService
 {
-    private readonly HttpClient _httpClient;
-    private const string BaseUrl = "/api/quotations";
+    private readonly IHttpClientFactory _httpClientFactory;
+    private const string BaseUrl = "api/quotations";
     private const int MaxRetries = 3;
     private const int RetryDelayMs = 1000;
 
-    public QuotationService(HttpClient httpClient)
+    public QuotationService(IHttpClientFactory httpClientFactory)
     {
-        _httpClient = httpClient;
+        _httpClientFactory = httpClientFactory;
+        Console.WriteLine("QuotationService initialized");
+    }
+
+    private HttpClient CreateClient()
+    {
+        var client = _httpClientFactory.CreateClient("API");
+        client.DefaultRequestHeaders.Add("X-API-Key", "your-api-key");
+        Console.WriteLine($"Created HTTP client with base address: {client.BaseAddress}");
+        return client;
     }
 
     private async Task<T> RetryOperation<T>(Func<Task<T>> operation, string operationName)
@@ -45,17 +54,40 @@ public class QuotationService : IQuotationService
     {
         return await RetryOperation(async () =>
         {
-            Console.WriteLine("Fetching quotes from API...");
-            var quotes = await _httpClient.GetFromJsonAsync<List<QuoteDto>>(BaseUrl);
-            Console.WriteLine($"Received {quotes?.Count ?? 0} quotes from API");
-            if (quotes != null)
+            using var client = CreateClient();
+            var requestUrl = BaseUrl;
+            Console.WriteLine($"Fetching quotes from API at {client.BaseAddress}{requestUrl}...");
+            
+            try
             {
-                foreach (var quote in quotes)
+                var quotes = await client.GetFromJsonAsync<List<QuoteDto>>(requestUrl);
+                Console.WriteLine($"Received {quotes?.Count ?? 0} quotes from API");
+                
+                if (quotes != null)
                 {
-                    Console.WriteLine($"Quote received: ID={quote.QuoteId}, Customer={quote.CustomerName}");
+                    foreach (var quote in quotes)
+                    {
+                        Console.WriteLine($"Quote received: ID={quote.QuoteId}, Customer={quote.CustomerName}");
+                    }
                 }
+                else
+                {
+                    Console.WriteLine("Received null response from API");
+                }
+                
+                return quotes ?? new List<QuoteDto>();
             }
-            return quotes ?? new List<QuoteDto>();
+            catch (HttpRequestException ex)
+            {
+                Console.WriteLine($"HTTP request failed: {ex.Message}");
+                Console.WriteLine($"Status code: {ex.StatusCode}");
+                throw;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Unexpected error: {ex.GetType().Name} - {ex.Message}");
+                throw;
+            }
         }, "GetQuotes");
     }
 
@@ -63,7 +95,8 @@ public class QuotationService : IQuotationService
     {
         return await RetryOperation(async () =>
         {
-            var quote = await _httpClient.GetFromJsonAsync<QuoteDto>($"{BaseUrl}/{id}");
+            using var client = CreateClient();
+            var quote = await client.GetFromJsonAsync<QuoteDto>($"{BaseUrl}/{id}");
             return quote ?? new QuoteDto();
         }, $"GetQuote {id}");
     }
@@ -72,8 +105,9 @@ public class QuotationService : IQuotationService
     {
         return await RetryOperation(async () =>
         {
+            using var client = CreateClient();
             Console.WriteLine($"Creating quote for customer {quote.CustomerId}...");
-            var response = await _httpClient.PostAsJsonAsync(BaseUrl, quote);
+            var response = await client.PostAsJsonAsync(BaseUrl, quote);
             response.EnsureSuccessStatusCode();
             var createdQuote = await response.Content.ReadFromJsonAsync<QuoteDto>();
             Console.WriteLine($"Quote created successfully with ID: {createdQuote?.QuoteId}");
@@ -85,7 +119,8 @@ public class QuotationService : IQuotationService
     {
         return await RetryOperation(async () =>
         {
-            var response = await _httpClient.PutAsJsonAsync($"{BaseUrl}/{quote.QuoteId}", quote);
+            using var client = CreateClient();
+            var response = await client.PutAsJsonAsync($"{BaseUrl}/{quote.QuoteId}", quote);
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadFromJsonAsync<QuoteDto>() ?? new QuoteDto();
         }, $"UpdateQuote {quote.QuoteId}");
@@ -95,7 +130,8 @@ public class QuotationService : IQuotationService
     {
         await RetryOperation(async () =>
         {
-            var response = await _httpClient.DeleteAsync($"{BaseUrl}/{id}");
+            using var client = CreateClient();
+            var response = await client.DeleteAsync($"{BaseUrl}/{id}");
             response.EnsureSuccessStatusCode();
             return true;
         }, $"DeleteQuote {id}");

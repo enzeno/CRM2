@@ -3,110 +3,167 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="using:CRM2.Desktop.Features.Quotations"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
+        mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="700"
         x:Class="CRM2.Desktop.Features.Quotations.QuoteDialog"
         x:DataType="vm:QuoteDialogViewModel"
         Title="{Binding Title}"
-        Width="900" Height="700"
-        WindowStartupLocation="CenterOwner">
+        Width="1200" Height="700"
+        Background="{DynamicResource BackgroundBrush}"
+        WindowStartupLocation="CenterOwner"
+        ExtendClientAreaToDecorationsHint="True">
 
-    <DockPanel Margin="20">
-        <!-- Status Message -->
-        <TextBlock DockPanel.Dock="Top" 
-                  Text="{Binding StatusMessage}"
-                  Foreground="{Binding StatusMessage, Converter={x:Static vm:StatusToColorConverter.Instance}}"
-                  IsVisible="{Binding StatusMessage, Converter={x:Static vm:StringNotEmptyConverter.Instance}}"
-                  Margin="0,0,0,10"/>
+    <Window.Styles>
+        <StyleInclude Source="/Features/Shared/SharedStyles.axaml"/>
+    </Window.Styles>
 
-        <!-- Bottom Buttons -->
-        <StackPanel DockPanel.Dock="Bottom" 
-                   Orientation="Horizontal" 
-                   HorizontalAlignment="Right" 
-                   Spacing="10" 
-                   Margin="0,20,0,0">
-            <Button Content="Save" Command="{Binding SaveCommand}"/>
-            <Button Content="Cancel" Command="{Binding CancelCommand}"/>
-        </StackPanel>
+    <Border Margin="20" Classes="card">
+        <DockPanel Margin="20">
+            <!-- Status Message -->
+            <TextBlock DockPanel.Dock="Top" 
+                      Text="{Binding StatusMessage}"
+                      Foreground="{Binding StatusMessage, Converter={x:Static vm:StatusToColorConverter.Instance}}"
+                      IsVisible="{Binding StatusMessage, Converter={x:Static vm:StringNotEmptyConverter.Instance}}"
+                      Margin="0,0,0,15"/>
 
-        <!-- Main Content -->
-        <ScrollViewer>
-            <StackPanel Spacing="15">
-                <!-- Customer Selection -->
-                <StackPanel>
-                    <TextBlock Text="Customer" FontWeight="Bold"/>
-                    <ComboBox ItemsSource="{Binding Customers}"
-                            SelectedItem="{Binding SelectedCustomer}"
-                            Width="300"
-                            HorizontalAlignment="Left">
-                        <ComboBox.ItemTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding OrganizationName}"/>
-                            </DataTemplate>
-                        </ComboBox.ItemTemplate>
-                    </ComboBox>
-                </StackPanel>
-
-                <!-- Currency -->
-                <StackPanel>
-                    <TextBlock Text="Currency" FontWeight="Bold"/>
-                    <ComboBox ItemsSource="{Binding CurrencyCodes}"
-                            SelectedItem="{Binding CurrencyCode}"
-                            Width="100"
-                            HorizontalAlignment="Left"/>
-                </StackPanel>
-
-                <!-- Comments -->
-                <StackPanel>
-                    <TextBlock Text="Customer Comments" FontWeight="Bold"/>
-                    <TextBox Text="{Binding CustomerComments}"
-                            Height="60"
-                            AcceptsReturn="True"
-                            TextWrapping="Wrap"/>
-                </StackPanel>
-
-                <StackPanel>
-                    <TextBlock Text="Internal Comments" FontWeight="Bold"/>
-                    <TextBox Text="{Binding InternalComments}"
-                            Height="60"
-                            AcceptsReturn="True"
-                            TextWrapping="Wrap"/>
-                </StackPanel>
-
-                <!-- Line Items -->
-                <StackPanel>
-                    <TextBlock Text="Line Items" FontWeight="Bold"/>
-                    <StackPanel Orientation="Horizontal" 
-                              HorizontalAlignment="Right" 
-                              Spacing="5" 
-                              Margin="0,5">
-                        <Button Content="Add Item" Command="{Binding AddLineItemCommand}"/>
-                        <Button Content="Edit Item" 
-                                Command="{Binding EditLineItemCommand}"
-                                CommandParameter="{Binding SelectedLineItem}"
-                                IsEnabled="{Binding SelectedLineItem, Converter={x:Static ObjectConverters.IsNotNull}}"/>
-                        <Button Content="Remove Item" 
-                                Command="{Binding RemoveLineItemCommand}"
-                                CommandParameter="{Binding SelectedLineItem}"
-                                IsEnabled="{Binding SelectedLineItem, Converter={x:Static ObjectConverters.IsNotNull}}"/>
-                    </StackPanel>
-
-                    <DataGrid ItemsSource="{Binding LineItems}"
-                            SelectedItem="{Binding SelectedLineItem}"
-                            AutoGenerateColumns="False"
-                            IsReadOnly="True"
-                            Height="200">
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header="Line #" Binding="{Binding LineNumber}"/>
-                            <DataGridTextColumn Header="Part Number" Binding="{Binding PartNumber}"/>
-                            <DataGridTextColumn Header="Description" Binding="{Binding Description}"/>
-                            <DataGridTextColumn Header="Quantity" Binding="{Binding Quantity}"/>
-                            <DataGridTextColumn Header="Sell Price" Binding="{Binding SellPrice, StringFormat={}{0:N2}}"/>
-                            <DataGridTextColumn Header="Total" Binding="{Binding Total, StringFormat={}{0:N2}}"/>
-                            <DataGridTextColumn Header="Currency" Binding="{Binding CurrencyCode}"/>
-                        </DataGrid.Columns>
-                    </DataGrid>
-                </StackPanel>
+            <!-- Bottom Buttons -->
+            <StackPanel DockPanel.Dock="Bottom" 
+                       Orientation="Horizontal" 
+                       HorizontalAlignment="Right" 
+                       Spacing="10" 
+                       Margin="0,20,0,0">
+                <Button Classes="success" Command="{Binding SaveCommand}">
+                    <Button.Content>
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <PathIcon Data="{StaticResource save_regular}" Width="16" Height="16"/>
+                            <TextBlock Text="Save"/>
+                        </StackPanel>
+                    </Button.Content>
+                </Button>
+                <Button Classes="gray" Command="{Binding CancelCommand}">
+                    <Button.Content>
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <PathIcon Data="{StaticResource dismiss_regular}" Width="16" Height="16"/>
+                            <TextBlock Text="Cancel"/>
+                        </StackPanel>
+                    </Button.Content>
+                </Button>
             </StackPanel>
-        </ScrollViewer>
-    </DockPanel>
+
+            <!-- Main Content -->
+            <Grid ColumnDefinitions="1*,1*" Margin="0,0,0,20">
+                <!-- Left Column -->
+                <StackPanel Grid.Column="0" Margin="0,0,10,0" Spacing="20">
+                    <!-- Customer Information -->
+                    <Border Classes="card">
+                        <StackPanel>
+                            <TextBlock Text="Customer Information" Classes="h2" Margin="0,0,0,15"/>
+                            <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto" Margin="0,0,0,10">
+                                <TextBlock Text="Customer" Grid.Row="0" Grid.Column="0" Margin="0,0,15,10"/>
+                                <ComboBox Grid.Row="0" Grid.Column="1"
+                                        ItemsSource="{Binding Customers}"
+                                        SelectedItem="{Binding SelectedCustomer}"
+                                        HorizontalAlignment="Stretch">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding OrganizationName}"/>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+
+                                <TextBlock Text="Currency" Grid.Row="1" Grid.Column="0" Margin="0,0,15,0"/>
+                                <ComboBox Grid.Row="1" Grid.Column="1"
+                                        ItemsSource="{Binding CurrencyCodes}"
+                                        SelectedItem="{Binding CurrencyCode}"
+                                        Width="100"
+                                        HorizontalAlignment="Left"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Comments -->
+                    <Border Classes="card">
+                        <StackPanel>
+                            <TextBlock Text="Comments" Classes="h2" Margin="0,0,0,15"/>
+                            <StackPanel Spacing="15">
+                                <StackPanel>
+                                    <TextBlock Text="Customer Comments" Margin="0,0,0,5"/>
+                                    <TextBox Text="{Binding CustomerComments}"
+                                            Height="80"
+                                            AcceptsReturn="True"
+                                            TextWrapping="Wrap"/>
+                                </StackPanel>
+
+                                <StackPanel>
+                                    <TextBlock Text="Internal Comments" Margin="0,0,0,5"/>
+                                    <TextBox Text="{Binding InternalComments}"
+                                            Height="80"
+                                            AcceptsReturn="True"
+                                            TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+                <!-- Right Column -->
+                <Border Grid.Column="1" Margin="10,0,0,0" Classes="card">
+                    <DockPanel>
+                        <TextBlock Text="Line Items" Classes="h2" DockPanel.Dock="Top" Margin="0,0,0,15"/>
+                        <StackPanel DockPanel.Dock="Top" 
+                                  Orientation="Horizontal" 
+                                  HorizontalAlignment="Right" 
+                                  Spacing="8" 
+                                  Margin="0,0,0,15">
+                            <Button Command="{Binding AddLineItemCommand}">
+                                <Button.Content>
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <PathIcon Data="{StaticResource add_regular}" Width="16" Height="16"/>
+                                        <TextBlock Text="Add Item"/>
+                                    </StackPanel>
+                                </Button.Content>
+                            </Button>
+                            <Button Classes="success"
+                                    Command="{Binding EditLineItemCommand}"
+                                    CommandParameter="{Binding SelectedLineItem}"
+                                    IsEnabled="{Binding SelectedLineItem, Converter={x:Static ObjectConverters.IsNotNull}}">
+                                <Button.Content>
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <PathIcon Data="{StaticResource edit_regular}" Width="16" Height="16"/>
+                                        <TextBlock Text="Edit Item"/>
+                                    </StackPanel>
+                                </Button.Content>
+                            </Button>
+                            <Button Classes="danger"
+                                    Command="{Binding RemoveLineItemCommand}"
+                                    CommandParameter="{Binding SelectedLineItem}"
+                                    IsEnabled="{Binding SelectedLineItem, Converter={x:Static ObjectConverters.IsNotNull}}">
+                                <Button.Content>
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <PathIcon Data="{StaticResource delete_regular}" Width="16" Height="16"/>
+                                        <TextBlock Text="Remove Item"/>
+                                    </StackPanel>
+                                </Button.Content>
+                            </Button>
+                        </StackPanel>
+
+                        <DataGrid ItemsSource="{Binding LineItems}"
+                                SelectedItem="{Binding SelectedLineItem}"
+                                AutoGenerateColumns="False"
+                                IsReadOnly="True"
+                                GridLinesVisibility="Horizontal"
+                                HorizontalGridLinesBrush="{DynamicResource BorderBrush}"
+                                VerticalGridLinesBrush="Transparent"
+                                Background="Transparent">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="*"/>
+                                <DataGridTextColumn Header="Quantity" Binding="{Binding Quantity}" Width="Auto"/>
+                                <DataGridTextColumn Header="Unit Price" Binding="{Binding SellPrice, StringFormat={}{0:N2}}" Width="Auto"/>
+                                <DataGridTextColumn Header="Total" Binding="{Binding Total, StringFormat={}{0:N2}}" Width="Auto"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </DockPanel>
+                </Border>
+            </Grid>
+        </DockPanel>
+    </Border>
 </Window> 

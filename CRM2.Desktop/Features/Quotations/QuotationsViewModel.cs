@@ -8,14 +8,20 @@ using CRM2.Desktop.Features.Contacts;
 using System.Linq;
 using System.Collections.Generic;
 using Avalonia.Threading;
+using CRM2.Desktop.Services;
+using Avalonia.Platform.Storage;
+using System.IO;
+using Microsoft.Extensions.DependencyInjection;
+using System.Diagnostics;
 
 namespace CRM2.Desktop.Features.Quotations
 {
     public partial class QuotationsViewModel : ObservableObject
     {
         private readonly IQuotationService _quotationService;
-        private readonly IContactService _contactService;
+        private readonly IPdfExportService _pdfExportService;
         private readonly Window _parentWindow;
+        private readonly IServiceProvider _serviceProvider;
         private List<QuoteDto> _allQuotes = new();
 
         [ObservableProperty]
@@ -27,13 +33,84 @@ namespace CRM2.Desktop.Features.Quotations
         [ObservableProperty]
         private QuoteDto? _selectedQuote;
 
-        // Initialize once here, no reassignment in constructor
         public ObservableCollection<QuoteDto> Quotes { get; } = new();
 
         // CommunityToolkit.Mvvm auto-hook for when SearchText changes
         partial void OnSearchTextChanged(string value)
         {
             FilterQuotes();
+        }
+
+        public QuotationsViewModel(
+            IQuotationService quotationService,
+            IPdfExportService pdfExportService,
+            Window parentWindow,
+            IServiceProvider serviceProvider)
+        {
+            _quotationService = quotationService;
+            _pdfExportService = pdfExportService;
+            _parentWindow = parentWindow;
+            _serviceProvider = serviceProvider;
+            
+            // Load quotes on UI thread to avoid async issues
+            Dispatcher.UIThread.Post(async () =>
+            {
+                await LoadQuotesAsync();
+            });
+        }
+
+        [RelayCommand]
+        private async Task CreateQuoteAsync()
+        {
+            try
+            {
+                var quoteDialog = new QuoteDialog();
+                var contactService = _serviceProvider.GetRequiredService<IContactService>();
+                var viewModel = new QuoteDialogViewModel(_quotationService, contactService, quoteDialog);
+                quoteDialog.DataContext = viewModel;
+
+                var result = await quoteDialog.ShowDialog<QuoteDto?>(_parentWindow);
+                if (result != null)
+                {
+                    _allQuotes.Add(result);
+                    FilterQuotes();
+                    StatusMessage = "Quote created successfully";
+                }
+            }
+            catch (Exception ex)
+            {
+                StatusMessage = $"Error creating quote: {ex.Message}";
+            }
+        }
+
+        [RelayCommand]
+        private async Task EditQuoteAsync(QuoteDto? quote)
+        {
+            if (quote == null) return;
+
+            try
+            {
+                var quoteDialog = new QuoteDialog();
+                var contactService = _serviceProvider.GetRequiredService<IContactService>();
+                var viewModel = new QuoteDialogViewModel(_quotationService, contactService, quoteDialog, quote);
+                quoteDialog.DataContext = viewModel;
+
+                var result = await quoteDialog.ShowDialog<QuoteDto?>(_parentWindow);
+                if (result != null)
+                {
+                    var index = _allQuotes.IndexOf(quote);
+                    if (index != -1)
+                    {
+                        _allQuotes[index] = result;
+                        FilterQuotes();
+                    }
+                    StatusMessage = "Quote updated successfully";
+                }
+            }
+            catch (Exception ex)
+            {
+                StatusMessage = $"Error updating quote: {ex.Message}";
+            }
         }
 
         private void FilterQuotes()
@@ -97,32 +174,35 @@ namespace CRM2.Desktop.Features.Quotations
             });
         }
 
-        public QuotationsViewModel(IQuotationService quotationService, IContactService contactService, Window parentWindow)
-        {
-            _quotationService = quotationService;
-            _contactService = contactService;
-            _parentWindow = parentWindow;
-            
-            // Load quotes on UI thread to avoid async issues
-            Dispatcher.UIThread.Post(async () =>
-            {
-                await LoadQuotesAsync();
-            });
-        }
-
         private async Task LoadQuotesAsync()
         {
             try
             {
-                Console.WriteLine("Loading quotes...");
+                Console.WriteLine("Starting to load quotes...");
+                StatusMessage = "Loading quotes...";
+                
+                Console.WriteLine("Calling GetQuotesAsync...");
                 var quotes = await _quotationService.GetQuotesAsync();
+                Console.WriteLine($"Received {quotes?.Count ?? 0} quotes from service");
+                
+                if (quotes == null)
+                {
+                    throw new InvalidOperationException("Received null response from quotation service");
+                }
+                
                 _allQuotes = quotes.ToList();
+                Console.WriteLine("Updated _allQuotes list");
+                
                 FilterQuotes();
+                Console.WriteLine("Applied filters");
+                
                 StatusMessage = $"Loaded {quotes.Count} quotes";
+                Console.WriteLine("Load operation completed successfully");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error loading quotes: {ex.Message}");
+                Console.WriteLine($"Error loading quotes: {ex.GetType().Name} - {ex.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
                 StatusMessage = $"Error loading quotes: {ex.Message}";
             }
         }
@@ -138,58 +218,13 @@ namespace CRM2.Desktop.Features.Quotations
 
         public async Task RefreshQuotesAsync()
         {
-            await LoadQuotesAsync();
-        }
-
-        [RelayCommand]
-        private async Task CreateQuoteAsync()
-        {
             try
             {
-                var quoteDialog = new QuoteDialog();
-                var viewModel = new QuoteDialogViewModel(_quotationService, _contactService, quoteDialog);
-                quoteDialog.DataContext = viewModel;
-
-                var result = await quoteDialog.ShowDialog<QuoteDto?>(_parentWindow);
-                if (result != null)
-                {
-                    _allQuotes.Add(result);
-                    FilterQuotes();
-                    StatusMessage = "Quote created successfully";
-                }
+                await LoadQuotesAsync();
             }
             catch (Exception ex)
             {
-                StatusMessage = $"Error creating quote: {ex.Message}";
-            }
-        }
-
-        [RelayCommand]
-        private async Task EditQuoteAsync(QuoteDto? quote)
-        {
-            if (quote == null) return;
-
-            try
-            {
-                var quoteDialog = new QuoteDialog();
-                var viewModel = new QuoteDialogViewModel(_quotationService, _contactService, quoteDialog, quote);
-                quoteDialog.DataContext = viewModel;
-
-                var result = await quoteDialog.ShowDialog<QuoteDto?>(_parentWindow);
-                if (result != null)
-                {
-                    var index = _allQuotes.IndexOf(quote);
-                    if (index != -1)
-                    {
-                        _allQuotes[index] = result;
-                        FilterQuotes();
-                    }
-                    StatusMessage = "Quote updated successfully";
-                }
-            }
-            catch (Exception ex)
-            {
-                StatusMessage = $"Error updating quote: {ex.Message}";
+                StatusMessage = $"Error refreshing quotes: {ex.Message}";
             }
         }
 
@@ -217,6 +252,94 @@ namespace CRM2.Desktop.Features.Quotations
             catch (Exception ex)
             {
                 StatusMessage = $"Error deleting quote: {ex.Message}";
+            }
+        }
+
+        [RelayCommand]
+        private async Task ExportQuoteAsync(Button sourceButton)
+        {
+            if (SelectedQuote == null) return;
+
+            try
+            {
+                var exportMenu = new MenuFlyout();
+                
+                var saveMenuItem = new MenuItem { Header = "Save to File..." };
+                saveMenuItem.Click += async (s, e) => await SavePdfToFile(SelectedQuote);
+                
+                var previewMenuItem = new MenuItem { Header = "Preview" };
+                previewMenuItem.Click += async (s, e) => await PreviewPdf(SelectedQuote);
+                
+                exportMenu.Items.Add(saveMenuItem);
+                exportMenu.Items.Add(previewMenuItem);
+                
+                exportMenu.ShowAt(sourceButton);
+            }
+            catch (Exception ex)
+            {
+                StatusMessage = $"Error showing export options: {ex.Message}";
+            }
+        }
+
+        private async Task SavePdfToFile(QuoteDto quote)
+        {
+            try
+            {
+                var filePickerOptions = new FilePickerSaveOptions
+                {
+                    Title = "Save PDF",
+                    DefaultExtension = "pdf",
+                    ShowOverwritePrompt = true,
+                    FileTypeChoices = new[]
+                    {
+                        new FilePickerFileType("PDF Document") { Patterns = new[] { "*.pdf" } }
+                    }
+                };
+
+                var file = await _parentWindow.StorageProvider.SaveFilePickerAsync(filePickerOptions);
+                if (file != null)
+                {
+                    StatusMessage = "Generating PDF...";
+                    await _pdfExportService.ExportQuotationToPdfAsync(quote, file.Path.LocalPath);
+                    StatusMessage = "PDF exported successfully!";
+                }
+            }
+            catch (Exception ex)
+            {
+                StatusMessage = $"Error exporting PDF: {ex.Message}";
+            }
+        }
+
+        private async Task PreviewPdf(QuoteDto quote)
+        {
+            try
+            {
+                StatusMessage = "Generating PDF for preview...";
+                
+                // Create a temporary file
+                var tempFile = Path.Combine(Path.GetTempPath(), $"quote_{quote.QuoteId}_{DateTime.Now:yyyyMMddHHmmss}.pdf");
+                
+                await _pdfExportService.ExportQuotationToPdfAsync(quote, tempFile);
+                
+                // Open the PDF with the default viewer
+                if (OperatingSystem.IsMacOS())
+                {
+                    await Task.Run(() => Process.Start("open", tempFile));
+                }
+                else if (OperatingSystem.IsWindows())
+                {
+                    await Task.Run(() => Process.Start(new ProcessStartInfo(tempFile) { UseShellExecute = true }));
+                }
+                else if (OperatingSystem.IsLinux())
+                {
+                    await Task.Run(() => Process.Start("xdg-open", tempFile));
+                }
+                
+                StatusMessage = "PDF opened for preview";
+            }
+            catch (Exception ex)
+            {
+                StatusMessage = $"Error previewing PDF: {ex.Message}";
             }
         }
     }

@@ -6,42 +6,104 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="CRM2.Desktop.Features.Quotations.QuotationsView"
              x:DataType="vm:QuotationsViewModel">
-    <DockPanel>
-        <StackPanel DockPanel.Dock="Top" Margin="10">
-            <TextBlock Text="{Binding StatusMessage}" 
-                       Foreground="{Binding StatusMessage, Converter={x:Static vm:StatusToColorConverter.Instance}}"
-                       IsVisible="{Binding StatusMessage, Converter={x:Static vm:StringNotEmptyConverter.Instance}}"/>
-            <TextBox Text="{Binding SearchText}" Watermark="Search quotations..." Margin="0,10,0,10"/>
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="5">
-                <Button Content="Create New Quote" Command="{Binding CreateQuoteCommand}"/>
-                <Button Content="Edit" 
-                        Command="{Binding EditQuoteCommand}" 
-                        CommandParameter="{Binding SelectedQuote}"
-                        IsEnabled="{Binding SelectedQuote, Converter={x:Static ObjectConverters.IsNotNull}}"/>
-                <Button Content="Delete" 
-                        Command="{Binding DeleteQuoteCommand}" 
-                        CommandParameter="{Binding SelectedQuote}"
-                        IsEnabled="{Binding SelectedQuote, Converter={x:Static ObjectConverters.IsNotNull}}"/>
-            </StackPanel>
-        </StackPanel>
+    
+    <UserControl.Styles>
+        <StyleInclude Source="/Features/Shared/SharedStyles.axaml"/>
+    </UserControl.Styles>
 
-        <DataGrid ItemsSource="{Binding Quotes}"
-                  SelectedItem="{Binding SelectedQuote}"
-                  IsReadOnly="True"
-                  GridLinesVisibility="All"
-                  BorderThickness="1"
-                  BorderBrush="Gray"
-                  Margin="10">
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="Quote ID" Binding="{Binding QuoteId}"/>
-                <DataGridTextColumn Header="Customer" Binding="{Binding CustomerName}"/>
-                <DataGridTextColumn Header="Status" Binding="{Binding Status}"/>
-                <DataGridTextColumn Header="Currency" Binding="{Binding CurrencyCode}"/>
-                <DataGridTextColumn Header="Created By" Binding="{Binding CreatedBy}"/>
-                <DataGridTextColumn Header="Created At" Binding="{Binding CreatedAt}"/>
-                <DataGridTextColumn Header="Last Modified By" Binding="{Binding LastModifiedBy}"/>
-                <DataGridTextColumn Header="Updated At" Binding="{Binding UpdatedAt}"/>
-            </DataGrid.Columns>
-        </DataGrid>
-    </DockPanel>
+    <Border Background="{StaticResource BackgroundBrush}">
+        <DockPanel Margin="20">
+            <Border Classes="card" DockPanel.Dock="Top">
+                <StackPanel>
+                    <TextBlock Text="{Binding StatusMessage}" 
+                              Foreground="{Binding StatusMessage, Converter={x:Static vm:StatusToColorConverter.Instance}}"
+                              IsVisible="{Binding StatusMessage, Converter={x:Static vm:StringNotEmptyConverter.Instance}}"
+                              Margin="0,0,0,15"/>
+                    
+                    <TextBox Text="{Binding SearchText}" 
+                            Watermark="Search quotations..." 
+                            Margin="0,0,0,15">
+                        <TextBox.InnerLeftContent>
+                            <PathIcon Data="{StaticResource search_regular}"
+                                     Width="16"
+                                     Height="16"
+                                     Margin="8,0,0,0"
+                                     Foreground="{StaticResource GrayBrush}"/>
+                        </TextBox.InnerLeftContent>
+                    </TextBox>
+
+                    <StackPanel Orientation="Horizontal" 
+                              HorizontalAlignment="Right" 
+                              Spacing="8">
+                        <Button Command="{Binding CreateQuoteCommand}">
+                            <Button.Content>
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <PathIcon Data="{StaticResource add_regular}" Width="16" Height="16"/>
+                                    <TextBlock Text="Create New Quote"/>
+                                </StackPanel>
+                            </Button.Content>
+                        </Button>
+
+                        <Button Classes="success"
+                                Command="{Binding EditQuoteCommand}" 
+                                CommandParameter="{Binding SelectedQuote}"
+                                IsEnabled="{Binding SelectedQuote, Converter={x:Static ObjectConverters.IsNotNull}}">
+                            <Button.Content>
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <PathIcon Data="{StaticResource edit_regular}" Width="16" Height="16"/>
+                                    <TextBlock Text="Edit"/>
+                                </StackPanel>
+                            </Button.Content>
+                        </Button>
+
+                        <Button Classes="danger"
+                                Command="{Binding DeleteQuoteCommand}" 
+                                CommandParameter="{Binding SelectedQuote}"
+                                IsEnabled="{Binding SelectedQuote, Converter={x:Static ObjectConverters.IsNotNull}}">
+                            <Button.Content>
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <PathIcon Data="{StaticResource delete_regular}" Width="16" Height="16"/>
+                                    <TextBlock Text="Delete"/>
+                                </StackPanel>
+                            </Button.Content>
+                        </Button>
+
+                        <Button Name="ExportButton" 
+                                Classes="gray"
+                                Command="{Binding ExportQuoteCommand}"
+                                CommandParameter="{Binding #ExportButton}"
+                                IsEnabled="{Binding SelectedQuote, Converter={x:Static ObjectConverters.IsNotNull}}">
+                            <Button.Content>
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <PathIcon Data="{StaticResource document_pdf_regular}" Width="16" Height="16"/>
+                                    <TextBlock Text="Export to PDF"/>
+                                </StackPanel>
+                            </Button.Content>
+                        </Button>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <Border Classes="card">
+                <DataGrid ItemsSource="{Binding Quotes}"
+                         SelectedItem="{Binding SelectedQuote}"
+                         IsReadOnly="True"
+                         GridLinesVisibility="Horizontal"
+                         HorizontalGridLinesBrush="{StaticResource BorderBrush}"
+                         VerticalGridLinesBrush="Transparent"
+                         Background="Transparent">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Quote ID" Binding="{Binding QuoteId}" Width="Auto"/>
+                        <DataGridTextColumn Header="Customer" Binding="{Binding CustomerName}" Width="*"/>
+                        <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="Auto"/>
+                        <DataGridTextColumn Header="Currency" Binding="{Binding CurrencyCode}" Width="Auto"/>
+                        <DataGridTextColumn Header="Created By" Binding="{Binding CreatedBy}" Width="Auto"/>
+                        <DataGridTextColumn Header="Created At" Binding="{Binding CreatedAt}" Width="Auto"/>
+                        <DataGridTextColumn Header="Last Modified By" Binding="{Binding LastModifiedBy}" Width="Auto"/>
+                        <DataGridTextColumn Header="Updated At" Binding="{Binding UpdatedAt}" Width="Auto"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Border>
+        </DockPanel>
+    </Border>
 </UserControl> 

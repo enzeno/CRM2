@@ -1,0 +1,101 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="using:CRM2.Desktop.ViewModels"
+        mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="800"
+        x:Class="CRM2.Desktop.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Title="CRM2 System"
+        Background="{StaticResource BackgroundBrush}"
+        ExtendClientAreaToDecorationsHint="True">
+
+    <Window.Styles>
+        <StyleInclude Source="/Features/Shared/SharedStyles.axaml"/>
+        
+        <!-- Navigation Button Style -->
+        <Style Selector="Button.nav">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="15"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="CornerRadius" Value="4"/>
+        </Style>
+        
+        <Style Selector="Button.nav:pointerover">
+            <Setter Property="Background" Value="{StaticResource PrimaryBrush}"/>
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
+        
+        <Style Selector="Button.nav:disabled">
+            <Setter Property="Opacity" Value="0.5"/>
+        </Style>
+    </Window.Styles>
+
+    <DockPanel>
+        <!-- Left Navigation Panel -->
+        <Border DockPanel.Dock="Left" 
+                Width="250" 
+                Background="White"
+                BoxShadow="2 0 8 0 #20000000">
+            <StackPanel Margin="20,40,20,20" Spacing="10">
+                <TextBlock Text="CRM2 System" 
+                          Classes="h1"
+                          Margin="15,0,0,30"/>
+                
+                <!-- Navigation Buttons -->
+                <Button Classes="nav"
+                        Content="Contacts" 
+                        Command="{Binding NavigateToContactsCommand}">
+                    <Button.Content>
+                        <StackPanel Orientation="Horizontal" Spacing="12">
+                            <PathIcon Data="{StaticResource people_regular}" Width="20" Height="20"/>
+                            <TextBlock Text="Contacts" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button.Content>
+                </Button>
+                
+                <Button Classes="nav"
+                        Content="Quotations" 
+                        Command="{Binding NavigateToQuotationsCommand}">
+                    <Button.Content>
+                        <StackPanel Orientation="Horizontal" Spacing="12">
+                            <PathIcon Data="{StaticResource document_regular}" Width="20" Height="20"/>
+                            <TextBlock Text="Quotations" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button.Content>
+                </Button>
+                
+                <Button Classes="nav"
+                        Content="Invoices" 
+                        Command="{Binding NavigateToInvoicesCommand}"
+                        IsEnabled="False">
+                    <Button.Content>
+                        <StackPanel Orientation="Horizontal" Spacing="12">
+                            <PathIcon Data="{StaticResource receipt_regular}" Width="20" Height="20"/>
+                            <TextBlock Text="Invoices" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button.Content>
+                </Button>
+                
+                <Button Classes="nav"
+                        Content="Reports" 
+                        Command="{Binding NavigateToReportsCommand}"
+                        IsEnabled="False">
+                    <Button.Content>
+                        <StackPanel Orientation="Horizontal" Spacing="12">
+                            <PathIcon Data="{StaticResource chart_regular}" Width="20" Height="20"/>
+                            <TextBlock Text="Reports" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button.Content>
+                </Button>
+            </StackPanel>
+        </Border>
+
+        <!-- Main Content Area -->
+        <Panel Margin="20">
+            <ContentControl Content="{Binding CurrentView}" />
+        </Panel>
+    </DockPanel>
+</Window> 

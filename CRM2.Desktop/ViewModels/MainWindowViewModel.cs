@@ -1,56 +1,71 @@
 using System;
+using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Avalonia.Controls;
 using CRM2.Desktop.Features.Contacts;
 using CRM2.Desktop.Features.Quotations;
-using Microsoft.Extensions.DependencyInjection;
-using Avalonia.Controls;
+using CRM2.Desktop.Services;
 
 namespace CRM2.Desktop.ViewModels;
 
 public partial class MainWindowViewModel : ObservableObject
 {
+    private readonly IQuotationService _quotationService;
+    private readonly IContactService _contactService;
+    private readonly IPdfExportService _pdfExportService;
+    private readonly Window _parentWindow;
     private readonly IServiceProvider _serviceProvider;
-    private readonly Window _window;
 
     [ObservableProperty]
-    private object? _currentView;
+    private Control? _currentView;
 
-    public MainWindowViewModel(IServiceProvider serviceProvider, Window window)
+    public MainWindowViewModel(
+        IQuotationService quotationService,
+        IContactService contactService,
+        IPdfExportService pdfExportService,
+        Window parentWindow,
+        IServiceProvider serviceProvider)
     {
+        _quotationService = quotationService;
+        _contactService = contactService;
+        _pdfExportService = pdfExportService;
+        _parentWindow = parentWindow;
         _serviceProvider = serviceProvider;
-        _window = window;
-        // Initialize with Contacts view
-        NavigateToContacts();
+
+        // Set initial view
+        NavigateToQuotations();
     }
 
     [RelayCommand]
     private void NavigateToContacts()
     {
-        var viewModel = ActivatorUtilities.CreateInstance<ContactsViewModel>(_serviceProvider, _window);
-        var view = new ContactsView { DataContext = viewModel };
-        CurrentView = view;
+        var contactsView = new ContactsView
+        {
+            DataContext = new ContactsViewModel(_contactService, _parentWindow)
+        };
+        CurrentView = contactsView;
     }
 
     [RelayCommand]
     private void NavigateToQuotations()
     {
-        var viewModel = ActivatorUtilities.CreateInstance<QuotationsViewModel>(_serviceProvider, _window);
-        var view = new QuotationsView { DataContext = viewModel };
-        CurrentView = view;
+        var quotationsView = new QuotationsView
+        {
+            DataContext = new QuotationsViewModel(_quotationService, _pdfExportService, _parentWindow, _serviceProvider)
+        };
+        CurrentView = quotationsView;
     }
 
     [RelayCommand]
     private void NavigateToInvoices()
     {
-        // TODO: Implement Invoices view
-        // CurrentView = new InvoicesViewModel();
+        // To be implemented
     }
 
     [RelayCommand]
     private void NavigateToReports()
     {
-        // TODO: Implement Reports view
-        // CurrentView = new ReportsViewModel();
+        // To be implemented
     }
 } 
